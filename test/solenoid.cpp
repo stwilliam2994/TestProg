@@ -2,8 +2,6 @@
 
 // Solenoid Menu
 	
-#define MIN_SOLENOID_CHANNEL 0
-#define MAX_SOLENOID_CHANNEL 7
 	
 // The solenoid menu looks like this (not including the 1st 2 columns):
 // 1:Solenoid

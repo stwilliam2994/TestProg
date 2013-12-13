@@ -1,5 +1,7 @@
 #include "base.h"
 
+DigitalIO * DigitalIO::instance_m = NULL;
+
 DigitalIO::DigitalIO ()
 {
 	for (UINT32 i = 0; i < NUM_DIO_CHANNELS; i++)
@@ -26,6 +28,8 @@ DigitalIO::~DigitalIO ()
 			delete DIOTable_mp[i].DigitalOutput_p;
 		}	
 	}
+	
+	// Don't forget to delete instance_m
 };
 
 bool DigitalIO::IsInput (int channel)
@@ -76,4 +80,13 @@ void DigitalIO::SetValue (int channel, bool value)
 	{
 		return DIOTable_mp[channel].DigitalOutput_p->Set(value); 
 	}
+}
+
+DigitalIO * DigitalIO::GetInstance ()
+{
+	if (instance_m == NULL)
+	{
+		instance_m = new DigitalIO();
+	}
+    return instance_m;
 }

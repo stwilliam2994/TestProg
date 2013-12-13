@@ -21,7 +21,6 @@ void BaseMenu::HandleIndexDown ()
 	{
 		index_m = minIndex_m;
 	}
-	//UpdateDisplay();
 }
 
 void BaseMenu::HandleIndexUp ()
@@ -31,7 +30,6 @@ void BaseMenu::HandleIndexUp ()
 	{
 		index_m = maxIndex_m;
 	}
-	//UpdateDisplay();
 }
 	
 menuType BaseMenu::HandleSelectLeft ()
@@ -62,4 +60,8 @@ DriverStationLCD::Line BaseMenu::IndexToLCDLine (int line)
 	return static_cast<DriverStationLCD::Line>(line - 1);
 }
 	
+void BaseMenu::SetSpeed (float speed)
+{
+	
+}
 	

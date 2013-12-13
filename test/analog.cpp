@@ -1,10 +1,7 @@
 #include "base.h"
 
 // Analog Menu
-	
-#define MIN_ANALOG_CHANNEL 0
-#define MAX_ANALOG_CHANNEL 7
-	
+		
 // The analog menu looks like this (not including the 1st 2 columns):
 // 1:Analog
 // 2: Channel: #
@@ -15,11 +12,12 @@
 
 AnalogMenu::AnalogMenu()
 {
-	// The index control can point at Channel and Back
+	// The index control can point at Channel and Back. Start out pointing
+	// at Channel
 	index_m    = 2;
 	maxIndex_m = 3;
 	
-	// Always start pointing at Channel and analog channel values initialize to zero
+	// Always start pointing at Channel 0 and analog channel values initialize to zero
 	currentChannelNum_m   = 0;
 	currentChannelValue_m = 0.0;
 	
@@ -56,10 +54,7 @@ menuType AnalogMenu::HandleSelectLeft ()
 		default:
 			return ANALOG;
 	};
-	
-	// This is now done in the main loop
-	// UpdateDisplay();
-	
+		
 	return ANALOG;
 }
 
@@ -76,13 +71,10 @@ menuType AnalogMenu::HandleSelectRight ()
 			currentChannelValue_m = channel_mp[currentChannelNum_m]->GetVoltage();
 			break;
 		case 3: // We only allow a select left to return to a previous menu
-			// return callingMenu_m;
+			break;
 		default:
 			return ANALOG;
 	};
-
-	// This is now done in the main loop
-	// UpdateDisplay();
 	
 	return ANALOG;
 }

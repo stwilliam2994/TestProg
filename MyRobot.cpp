@@ -80,9 +80,9 @@ public:
 		BaseMenu * menus[NUM_MENU_TYPE];
 		menus[TOP] = new TopMenu;
 		menus[ANALOG] = new AnalogMenu;
-		menus[DIGITAL_TOP] = new BaseMenu;
+		menus[DIGITAL_TOP] = new DigitalMenu;
 		menus[SOLENOID] = new SolenoidMenu;
-		menus[DIGITAL_PWM] = new BaseMenu;
+		menus[DIGITAL_PWM] = new PWMMenu;
 		menus[DIGITAL_IO] = new BaseMenu;
 		menus[DIGITAL_RELAY] = new BaseMenu;
 		menus[DIGITAL_IO_STATE] = new BaseMenu;
@@ -144,6 +144,9 @@ public:
 				menus[newMenu]->UpdateDisplay();
 				currentMenu = newMenu;
 			}
+			
+			// Set the motor speed(s) (if any are enabled)
+			menus[DIGITAL_PWM]->SetSpeed(gamepad.GetRightX());
 			
 			// Update gamepad button states
 			gamepad.Update();

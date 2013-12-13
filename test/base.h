@@ -3,7 +3,7 @@
 
 #include "WPILib.h"
 
-
+// The complete list of menus in the test program
 typedef enum 
 {
 	TOP,				// Points to analog, digitalTop, and solenoid
@@ -19,6 +19,17 @@ typedef enum
 	NUM_MENU_TYPE
 } menuType;
 
+// For convenience when calling DriverStaionLCF::PrintfLine (and etc.)
+#define LCD1 DriverStationLCD::kUser_Line1
+#define LCD2 DriverStationLCD::kUser_Line2
+#define LCD3 DriverStationLCD::kUser_Line3
+#define LCD4 DriverStationLCD::kUser_Line4
+#define LCD5 DriverStationLCD::kUser_Line5
+#define LCD6 DriverStationLCD::kUser_Line6
+
+// ----------------------------------------------------------------------------
+// Base class for all of the other menus in the system
+// ----------------------------------------------------------------------------
 
 // The menu base class contains all of the basic operations of a menu
 // with up to six lines of 20 characters (the LCD display on the driver
@@ -35,13 +46,6 @@ typedef enum
 // class to allow us to use a base-class pointer to refer to any derived
 // class instance.
 
-#define LCD1 DriverStationLCD::kUser_Line1
-#define LCD2 DriverStationLCD::kUser_Line2
-#define LCD3 DriverStationLCD::kUser_Line3
-#define LCD4 DriverStationLCD::kUser_Line4
-#define LCD5 DriverStationLCD::kUser_Line5
-#define LCD6 DriverStationLCD::kUser_Line6
-
 class BaseMenu
 {
 
@@ -53,6 +57,7 @@ public:
 	virtual  menuType HandleSelectLeft ();
 	virtual  menuType HandleSelectRight ();
 	virtual void UpdateDisplay ();
+	virtual void SetSpeed (float speed);
 	void SetCallingMenu (menuType callingMenu);
 	DriverStationLCD::Line IndexToLCDLine (int line);
 	
@@ -61,8 +66,11 @@ public:
 	int minIndex_m;
 	menuType callingMenu_m;
 	DriverStationLCD *dsLCD;
-
 };
+
+// ----------------------------------------------------------------------------
+// TOP menu
+// ----------------------------------------------------------------------------
 
 class TopMenu : public BaseMenu
 {
@@ -76,6 +84,13 @@ public:
 private:
 	menuType HandleSelect ();
 };
+
+// ----------------------------------------------------------------------------
+// SOLENOID menu
+// ----------------------------------------------------------------------------
+
+#define MIN_SOLENOID_CHANNEL 0
+#define MAX_SOLENOID_CHANNEL 7
 
 class SolenoidMenu : public BaseMenu
 {
@@ -92,8 +107,15 @@ public:
 	
 	int        currentChannelNum_m;
 	bool       currentChannelValue_m;
-	Solenoid * channel_mp[8];
+	Solenoid * channel_mp[MAX_SOLENOID_CHANNEL + 1];
 };
+
+// ----------------------------------------------------------------------------
+// ANALOG menu
+// ----------------------------------------------------------------------------
+
+#define MIN_ANALOG_CHANNEL 0
+#define MAX_ANALOG_CHANNEL 7
 
 class AnalogMenu : public BaseMenu
 {
@@ -109,8 +131,12 @@ public:
 	
 	int             currentChannelNum_m;
 	float           currentChannelValue_m;
-	AnalogChannel * channel_mp[8];
+	AnalogChannel * channel_mp[MAX_ANALOG_CHANNEL + 1];
 };
+
+// ----------------------------------------------------------------------------
+// A class to handle the digital IO ports for the DIGITAL_* menus
+// ----------------------------------------------------------------------------
 
 #define NUM_DIO_CHANNELS 14
 
@@ -137,7 +163,60 @@ public:
 	bool GetValue (int channel);
 	void SetValue (int channel, bool value);
 	
+	static DigitalIO * GetInstance ();
+	
+private:
+	static DigitalIO * instance_m;
+	
 	DigitalIOEntry DIOTable_mp[NUM_DIO_CHANNELS];
+};
+
+// ----------------------------------------------------------------------------
+// DIGITAL_IO menu
+// ----------------------------------------------------------------------------
+
+class DigitalMenu : public BaseMenu
+{
+	
+public:
+	DigitalMenu ();
+	menuType HandleSelectLeft ();
+	menuType HandleSelectRight ();
+	void UpdateDisplay ();
+};
+
+// ----------------------------------------------------------------------------
+// DIGITAL_PWM menu
+// ----------------------------------------------------------------------------
+
+#define MIN_PWM_CHANNEL 0
+#define MAX_PWM_CHANNEL 9
+
+class PWMMenu : public BaseMenu
+{
+typedef enum {
+	NEITHER,
+	A_ONLY,
+	B_ONLY,
+	BOTH
+} enabledType;
+
+
+public:
+	PWMMenu ();
+	virtual ~PWMMenu();
+	void doIndexUp ();
+	void doIndexDown ();
+	menuType HandleSelectLeft ();
+	menuType HandleSelectRight ();
+	void UpdateDisplay ();
+	void SetSpeed (float speed);
+	
+	int currentChannelNumA_m;
+	int currentChannelNumB_m;
+	int enabled_m;
+	Jaguar * channel_mp[MAX_PWM_CHANNEL + 1];
+
 };
 #endif
 

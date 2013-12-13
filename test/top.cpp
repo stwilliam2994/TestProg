@@ -38,6 +38,7 @@ menuType TopMenu::HandleSelect ()
 		return ANALOG;
 		break;
 	case 3:
+		return DIGITAL_TOP;
 		break;
 	case 4:
 		return SOLENOID;
