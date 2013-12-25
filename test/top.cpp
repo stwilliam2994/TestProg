@@ -2,16 +2,17 @@
 
 // Top Menu
 
-// The top menu looks like this (not including the first two columns
-// 1:Top
-// 2: Analog
-// 3: Digital
-// 4: Solenoid
-// 5: Reset
-// 6:
 
 TopMenu::TopMenu()
 {
+	// The top menu looks like this (not including the first two columns
+	// 1:Top
+	// 2: Analog
+	// 3: Digital
+	// 4: Solenoid
+	// 5: Reset
+	// 6:
+
 	index_m = 2;
 	maxIndex_m = 5;
 }

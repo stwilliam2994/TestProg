@@ -12,8 +12,14 @@
 // code is to enable the manipulation of individual channels on any of the modules using a menu-
 // driven interface which uses a few gamepad buttons and the LCD screen as its interface
 
+// PWM ports for robotDrive
+#define LEFT_DRIVE_PWM  1
+#define RIGHT_DRIVE_PWM 2
+
 class RobotDemo : public SimpleRobot
 {
+	Jaguar     leftMotor;
+	Jaguar     rightMotor;
 	RobotDrive myRobot;   // robot drive system
 	Joystick   stick;     // only joystick
 	EGamepad   gamepad;   // for test mode
@@ -22,18 +28,21 @@ class RobotDemo : public SimpleRobot
 
 public:
 	RobotDemo(void):
-		myRobot(1, 2),	// these must be initialized in the same order
+		leftMotor (LEFT_DRIVE_PWM),
+		rightMotor(RIGHT_DRIVE_PWM),
+		myRobot(&leftMotor, &rightMotor),	// these must be initialized in the same order
 		stick(1),		// as they are declared above.
 		gamepad(3)
 	{
 		myRobot.SetExpiration(0.1);
+		//myRobot.SetSafetyEnabled(false);
 		
 		dsLCD = DriverStationLCD::GetInstance();
 		
-		// Output the program name a build data in the hope that this will help
+		// Output the program name and build date/time in the hope that this will help
 		// us catch cases where we are downloading a program other than the one
 		// we think we are downloading. Keep in mind that if this source file
-		// does not change (and you don't so a complete rebuild) the timestamp
+		// does not change (and you don't do a complete rebuild) the timestamp
 		// will not change.
 		
 		dsLCD->Clear();
@@ -71,23 +80,36 @@ public:
 	/**
 	 * Run the test program
 	 */
-	
+	// The test program is organized as a set of hierarchical menus that are
+	// displayed on the LCD on the driver station. Each menu is either a set
+	// of submenus or is a menu controlling the use of a port (or ports) on 
+	// one of the IO modules plugged into the cRIO. 
+	// See base.h for a description of the test menu hierarchy
+
 	// <need to describe the menu hierarchy and user interface here>
 	void Test() 
 	{
 		menuType currentMenu = TOP;
-		menuType newMenu = TOP;
+		menuType newMenu     = TOP;
+		
 		BaseMenu * menus[NUM_MENU_TYPE];
+		
+		// <Really should default everything to BaseMEnu via a loop and then make 
+		// indicidual assignments>
 		menus[TOP] = new TopMenu;
 		menus[ANALOG] = new AnalogMenu;
 		menus[DIGITAL_TOP] = new DigitalMenu;
 		menus[SOLENOID] = new SolenoidMenu;
 		menus[DIGITAL_PWM] = new PWMMenu;
-		menus[DIGITAL_IO] = new BaseMenu;
-		menus[DIGITAL_RELAY] = new BaseMenu;
+		menus[DIGITAL_IO] = new DigitalIOMenu;
+		menus[DIGITAL_RELAY] = new RelayMenu;
 		menus[DIGITAL_IO_STATE] = new BaseMenu;
 		menus[DIGITAL_IO_CLOCK] = new BaseMenu;
 		menus[DIGITAL_IO_ENCODER] = new BaseMenu;
+
+		// Inform appropriate menus of already allocated ports
+		menus[DIGITAL_PWM]->SetTableEntry (LEFT_DRIVE_PWM, &leftMotor);
+		menus[DIGITAL_PWM]->SetTableEntry (RIGHT_DRIVE_PWM, &rightMotor);
 
 		// Write out the TOP menu for the first time
 		menus[currentMenu]->UpdateDisplay();
@@ -127,26 +149,34 @@ public:
 			// same 10 msec window. However, if using the dpad on the game 
 			// game controller this is physically impossible so we don't
 			// need to worry about a previous value of newMenu being 
-			// overwritten here.
+			// overwritten in the next bit of code.
 			
 			// The dpad right button is used to enter a submenu when the menu pointer
-			// points to a submenu item and to increase a value (where 
-			// appropriate) on any other menu item.
+			// points to a submenu item and to increase a value (where  appropriate) 
+			// on any other menu item.
 			if (kEventClosed == gamepad.GetDPadEvent(Gamepad::kRight))
 			{
 				newMenu = menus[currentMenu]->HandleSelectRight();
+				
+				// Handle change from one menu to a sub menu
+				if (newMenu != currentMenu)
+				{
+					// When we enter a menu we need to set the record the
+					// menu to return to. We do *not* want to do this when
+					// returning from a menu to its calling menu.
+					menus[newMenu]->SetCallingMenu(currentMenu);
+				}
 			}
 			
 			// Handle change from one menu to another
 			if (newMenu != currentMenu)
 			{
-				menus[newMenu]->SetCallingMenu(currentMenu);
 				menus[newMenu]->UpdateDisplay();
 				currentMenu = newMenu;
 			}
-			
-			// Set the motor speed(s) (if any are enabled)
-			menus[DIGITAL_PWM]->SetSpeed(gamepad.GetRightX());
+
+			// Set the motor speed(s) (if any have been enabled via the Digital PWM menu)
+			menus[DIGITAL_PWM]->SetSpeed(-1.0 * gamepad.GetRightY());
 			
 			// Update gamepad button states
 			gamepad.Update();

@@ -4,7 +4,7 @@
 		
 // The analog menu looks like this (not including the 1st 2 columns):
 // 1:Analog
-// 2: Channel: #
+// 2: Channel: # #.##
 // 3: Back
 // 4:
 // 5:
@@ -12,19 +12,20 @@
 
 AnalogMenu::AnalogMenu()
 {
-	// The index control can point at Channel and Back. Start out pointing
-	// at Channel
 	index_m    = 2;
 	maxIndex_m = 3;
 	
 	// Always start pointing at Channel 0 and analog channel values initialize to zero
 	currentChannelNum_m   = 0;
-	currentChannelValue_m = 0.0;
+	// currentChannelValue_m = 0.0;
 	
 	// Create a analog channel object for every channel on the module
-	// (note that analog channels are numbered 1->8 in the WPILib API and on the module)
+	// (note that analog channels are numbered 1->8 in the WPILib API and on the module
+	// but are 0->... here)
 	for (int i=0; i <= MAX_ANALOG_CHANNEL; i++)
 	{
+		// Need to assign from existing pointers here if and analog ports are already
+		// allocated in the the main RobotDemo constructor!
 		channel_mp[i] = new AnalogChannel(i + 1);
 	}
 }
@@ -47,7 +48,7 @@ menuType AnalogMenu::HandleSelectLeft ()
 			{
 				currentChannelNum_m = MAX_ANALOG_CHANNEL;
 			}
-			currentChannelValue_m = channel_mp[currentChannelNum_m]->GetVoltage();
+			//currentChannelValue_m = channel_mp[currentChannelNum_m]->GetVoltage();
 			break;
 		case 3: // Return to previous menu
 			return callingMenu_m;
@@ -68,7 +69,7 @@ menuType AnalogMenu::HandleSelectRight ()
 			{
 				currentChannelNum_m = MIN_ANALOG_CHANNEL;
 			}
-			currentChannelValue_m = channel_mp[currentChannelNum_m]->GetVoltage();
+			//currentChannelValue_m = channel_mp[currentChannelNum_m]->GetVoltage();
 			break;
 		case 3: // We only allow a select left to return to a previous menu
 			break;

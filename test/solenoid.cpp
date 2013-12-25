@@ -1,19 +1,18 @@
 #include "base.h"
 
 // Solenoid Menu
-	
-	
-// The solenoid menu looks like this (not including the 1st 2 columns):
-// 1:Solenoid
-// 2: Channel: #
-// 3: Set: $$$
-// 4: Back
-// 5:
-// 6:
+		
 	
 SolenoidMenu::SolenoidMenu()
 {
-	// The index control can point at Channel, Set, and Back
+	// The solenoid menu looks like this (not including the 1st 2 columns):
+	// 1:Solenoid
+	// 2: Channel: #
+	// 3: Set: $$$
+	// 4: Back
+	// 5:
+	// 6:
+
 	index_m    = 2;
 	maxIndex_m = 4;
 	
@@ -25,6 +24,9 @@ SolenoidMenu::SolenoidMenu()
 	// (note that solenoid channels are numbered 1->8 in the API but 0->7 on the module)
 	for (int i=0; i <= MAX_SOLENOID_CHANNEL; i++)
 	{
+		// Need to assign from existing pointers here if and solenoid ports are already
+		// allocated in the the main RobotDemo constructor!
+
 		channel_mp[i] = new Solenoid(i + 1);
 	}
 }

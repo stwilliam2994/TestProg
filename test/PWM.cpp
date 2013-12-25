@@ -13,10 +13,8 @@ PWMMenu::PWMMenu()
 	// 5: Back
 	// 6:
 	
-	// The index control can point at Channel A, Channel B, and Back
-	// Always start pointing at Channel A
 	index_m    = 2;
-	maxIndex_m = 4;
+	maxIndex_m = 5;
 	
 	// Start out with channel 0 for each
 	currentChannelNumA_m   = 0;
@@ -30,7 +28,10 @@ PWMMenu::PWMMenu()
 	
 	for (int i=0; i <= MAX_PWM_CHANNEL; i++)
 	{
+		// Need to assign from existing pointers here if and PWM ports are already
+		// allocated in the the main RobotDemo constructor! See SetTableEntry
 		channel_mp[i] = new Jaguar(i + 1);
+		channel_mp[i]->SetExpiration(0.2); 
 	}
 }
 
@@ -41,6 +42,12 @@ PWMMenu::~PWMMenu()
 		delete channel_mp[i];
 	}
 }
+
+void PWMMenu::SetTableEntry (int index, Jaguar * pointer)
+{
+	channel_mp[index] = pointer;
+	channel_mp[index]->SetExpiration(0.2);
+};
 
 menuType PWMMenu::HandleSelectLeft ()
 {
@@ -66,8 +73,10 @@ menuType PWMMenu::HandleSelectLeft ()
 			{
 				enabled_m = BOTH;
 			}
+			break;
 		case 5: // Return to previous menu
 			return callingMenu_m;
+			break;
 		default:
 			return DIGITAL_PWM;
 	};
@@ -94,6 +103,7 @@ menuType PWMMenu::HandleSelectRight ()
 			}
 			break;
 		case 4: // Increment the enabled flag
+			enabled_m++;
 			if (enabled_m > BOTH)
 			{
 				enabled_m = NEITHER;
@@ -114,7 +124,6 @@ void PWMMenu::SetSpeed (float speed)
 	// in each pass of the main program loop)
 	
 	bool alreadySet = false;
-	
 	for (int i = MIN_PWM_CHANNEL; i <= MAX_PWM_CHANNEL; i++)
 	{
 		alreadySet = false;
@@ -145,11 +154,13 @@ void PWMMenu::UpdateDisplay ()
 			"B Only",
 			"Both"
 		};
+	int chanA = currentChannelNumA_m + 1;
+	int chanB = currentChannelNumB_m + 1;
 
 	dsLCD->Clear();
 	dsLCD->PrintfLine(LCD1, "PWM");
-	dsLCD->PrintfLine(LCD2, " Channel A: %d", currentChannelNumA_m);
-	dsLCD->PrintfLine(LCD3, " Channel B: %d", currentChannelNumB_m);
+	dsLCD->PrintfLine(LCD2, " Channel A: %d", chanA);
+	dsLCD->PrintfLine(LCD3, " Channel B: %d", chanB);
 	dsLCD->PrintfLine(LCD4, " Enabled: %s", enabledStrings[enabled_m]);
 	dsLCD->PrintfLine(LCD5, " Back");
 	dsLCD->Printf(IndexToLCDLine(index_m), 1, "*");

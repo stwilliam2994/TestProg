@@ -2,10 +2,18 @@
 
 DigitalIO * DigitalIO::instance_m = NULL;
 
+
+// This is a class that should only ever be instantiated once. Its purpose
+// is to place control of the digital IO ports in a single place as digital
+// ports are required by numerous menus
+
 DigitalIO::DigitalIO ()
 {
 	for (UINT32 i = 0; i < NUM_DIO_CHANNELS; i++)
 	{
+		// Need to assign from existing pointers here if and digital IO ports 
+		// are already allocated in the the main RobotDemo constructor!
+
 		DIOTable_mp[i].DigitalInput_p  = new DigitalInput (i + 1);
 		DIOTable_mp[i].DigitalOutput_p = NULL;
 	}

@@ -3,6 +3,30 @@
 
 #include "WPILib.h"
 
+// The menus shown on the LCD are organized as follows:
+//
+//                          +---------------------+   
+//                          +         Top         +   
+//                          +---------------------+   
+//                                |    |    |
+//            +-------------------+    |    +--------------------+
+//            |                        |                         |
+// +---------------------+  +---------------------+   +---------------------+
+// +       Analog        +  +       Digital       +   +       Solenoid      +
+// +---------------------+  +---------------------+   +---------------------+
+//                                |    |    |
+//            +-------------------+    |    +--------------------+
+//            |                        |                         |
+// +---------------------+  +---------------------+   +---------------------+
+// +     Digital PWM     +  +     Digital IO      +   +    Digital Relay    +
+// +---------------------+  +---------------------+   +---------------------+
+//                                |    |    |
+//            +-------------------+    |    +--------------------+
+//            |                        |                         |
+// +---------------------+  +---------------------+   +---------------------+
+// +  Digital IO State   +  +  Digital IO Clock   +   + Digital IO Encoder  +
+// +---------------------+  +---------------------+   +---------------------+
+
 // The complete list of menus in the test program
 typedef enum 
 {
@@ -58,6 +82,8 @@ public:
 	virtual  menuType HandleSelectRight ();
 	virtual void UpdateDisplay ();
 	virtual void SetSpeed (float speed);
+	virtual void SetTableEntry (int index, Jaguar * pointer);
+
 	void SetCallingMenu (menuType callingMenu);
 	DriverStationLCD::Line IndexToLCDLine (int line);
 	
@@ -115,7 +141,9 @@ public:
 // ----------------------------------------------------------------------------
 
 #define MIN_ANALOG_CHANNEL 0
-#define MAX_ANALOG_CHANNEL 7
+// The last channel is always used for batt voltage so we do not have 
+// access to it (hence our max channel is 6 not 7)
+#define MAX_ANALOG_CHANNEL 6 
 
 class AnalogMenu : public BaseMenu
 {
@@ -130,7 +158,7 @@ public:
 	void     UpdateDisplay ();
 	
 	int             currentChannelNum_m;
-	float           currentChannelValue_m;
+	// float           currentChannelValue_m;
 	AnalogChannel * channel_mp[MAX_ANALOG_CHANNEL + 1];
 };
 
@@ -172,7 +200,7 @@ private:
 };
 
 // ----------------------------------------------------------------------------
-// DIGITAL_IO menu
+// DIGITAL_TOP menu
 // ----------------------------------------------------------------------------
 
 class DigitalMenu : public BaseMenu
@@ -211,12 +239,60 @@ public:
 	menuType HandleSelectRight ();
 	void UpdateDisplay ();
 	void SetSpeed (float speed);
+	void SetTableEntry (int index, Jaguar * pointer);
+
 	
 	int currentChannelNumA_m;
 	int currentChannelNumB_m;
 	int enabled_m;
+	
 	Jaguar * channel_mp[MAX_PWM_CHANNEL + 1];
 
 };
+
+// ----------------------------------------------------------------------------
+// DIGITAL_IO menu
+// ----------------------------------------------------------------------------
+
+class DigitalIOMenu : public BaseMenu
+{
+	
+public:
+	DigitalIOMenu ();
+	menuType HandleSelectLeft ();
+	menuType HandleSelectRight ();
+	void UpdateDisplay ();
+};
+
+// ----------------------------------------------------------------------------
+// RELAY menu
+// ----------------------------------------------------------------------------
+
+#define MIN_RELAY_CHANNEL 0
+#define MAX_RELAY_CHANNEL 7
+
+class RelayMenu : public BaseMenu
+{
+	
+public:
+	         RelayMenu ();
+	virtual ~RelayMenu();
+	
+	void     doIndexUp ();
+	void     doIndexDown ();
+	menuType HandleSelectLeft ();
+	menuType HandleSelectRight ();
+	void     UpdateDisplay ();
+	
+	Relay::Value IncrementChannelValue ();
+	Relay::Value DecrementChannelValue ();
+	int          RelayValueToInt (Relay::Value value);
+
+	
+	int          currentChannelNum_m;
+	Relay::Value currentChannelValue_m;
+	Relay *      channel_mp[MAX_RELAY_CHANNEL + 1];
+};
+
 #endif
 
