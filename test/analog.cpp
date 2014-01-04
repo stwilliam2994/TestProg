@@ -34,6 +34,9 @@ AnalogMenu::~AnalogMenu()
 {
 	for (int i=0; i <= MAX_ANALOG_CHANNEL; i++)
 	{
+		// This will delete any objects added to the table by SetAnalogTableEntry without
+		// the original creator knowing about it. However, this destructor won't ever
+		// be called
 		delete channel_mp[i];
 	}
 }
@@ -48,7 +51,6 @@ menuType AnalogMenu::HandleSelectLeft ()
 			{
 				currentChannelNum_m = MAX_ANALOG_CHANNEL;
 			}
-			//currentChannelValue_m = channel_mp[currentChannelNum_m]->GetVoltage();
 			break;
 		case 3: // Return to previous menu
 			return callingMenu_m;
@@ -69,7 +71,6 @@ menuType AnalogMenu::HandleSelectRight ()
 			{
 				currentChannelNum_m = MIN_ANALOG_CHANNEL;
 			}
-			//currentChannelValue_m = channel_mp[currentChannelNum_m]->GetVoltage();
 			break;
 		case 3: // We only allow a select left to return to a previous menu
 			break;
@@ -79,6 +80,16 @@ menuType AnalogMenu::HandleSelectRight ()
 	
 	return ANALOG;
 }
+
+void AnalogMenu::SetAnalogTableEntry (int index, AnalogChannel * pointer)
+{
+	// Need to assign from existing pointers here if any analog ports are already
+	// allocated in the the main RobotDemo constructor! Use SetAnalogTableEntry to
+	// overide any of the entries in this table as required.
+	delete channel_mp[index - 1];
+	
+	channel_mp[index - 1] = pointer;
+};
 
 void AnalogMenu::UpdateDisplay ()
 {

@@ -17,42 +17,41 @@ DigitalIOMenu::DigitalIOMenu()
 	maxIndex_m = 5;
 }
 
+DigitalIOMenu::~DigitalIOMenu()
+{
+
+}
+
 menuType DigitalIOMenu::HandleSelectLeft ()
 {
 	switch (index_m) 
 	{
-	// These cases can be removed because only back has meaning for a left select
-	case 2:
-		break;
-	case 3:
-		break;
-	case 4:
-		break;
-	case 5:
-		return callingMenu_m;
-		break;
-	default:
-		break;
+		case 5:
+			return callingMenu_m;
+			break;
+		default:
+			break;
 	}
+	
 	return DIGITAL_IO;
-
 }
 
 menuType DigitalIOMenu::HandleSelectRight ()
 {
 	switch (index_m) 
 	{
-	case 2:
-		break;
-	case 3:
-		break;
-	case 4:
-		break;
-	case 5:
-		break;
-	default:
-		break;
+		case 2:
+			return DIGITAL_IO_STATE;
+			break;
+		case 3:
+			break;
+		case 4:
+			return DIGITAL_IO_ENCODER;
+			break;
+		default:
+			break;
 	}
+	
 	return DIGITAL_IO;
 }
 

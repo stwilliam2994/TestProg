@@ -23,8 +23,9 @@ RelayMenu::RelayMenu()
 	// (note that relay channels are numbered 1->8 in the API but 0->7 here)
 	for (int i=0; i <= MAX_RELAY_CHANNEL; i++)
 	{
-		// Need to assign from existing pointers here if and relay ports are already
-		// allocated in the the main RobotDemo constructor!
+		// Need to assign from existing pointers here if any relay ports are already
+		// allocated in the the main RobotDemo constructor! Use SetRelayTableEntry to
+		// overide any of the entries in this table as required.
 
 		channel_mp[i] = new Relay(i + 1);
 	}
@@ -34,6 +35,9 @@ RelayMenu::~RelayMenu()
 {
 	for (int i=0; i <= MAX_RELAY_CHANNEL; i++)
 	{
+		// This will delete any objects added to the table by SetRelayTableEntry without
+		// the original creator knowing about it. However, this destructor won't ever
+		// be called
 		delete channel_mp[i];
 	}
 }
@@ -55,7 +59,7 @@ Relay::Value RelayMenu::IncrementChannelValue ()
 			return Relay::kOff;
 			break;
 		default:
-			// Should never get here. A swerr here WBN
+			wpi_setErrnoErrorWithContext ("Should never get here");
 			return Relay::kOff;
 	}
 }
@@ -77,7 +81,7 @@ Relay::Value RelayMenu::DecrementChannelValue ()
 			return Relay::kForward;
 			break;
 		default:
-			// Should never get here. A swerr here WBN
+			wpi_setErrnoErrorWithContext ("Should never get here");
 			return Relay::kOff;
 	}
 }
@@ -99,7 +103,7 @@ int RelayMenu::RelayValueToInt (Relay::Value value)
 			return 3;
 			break;
 		default:
-			// Should never get here. A swerr here WBN
+			wpi_setErrnoErrorWithContext ("Should never get here");
 			return 0;
 	}
 }
@@ -116,8 +120,8 @@ menuType RelayMenu::HandleSelectLeft ()
 			currentChannelValue_m = channel_mp[currentChannelNum_m]->Get();
 			break;
 		case 3: // Toggle channel value (it can only be true of false)
-			IncrementChannelValue();
-			channel_mp[RelayValueToInt(currentChannelValue_m)]->Set(currentChannelValue_m);
+			DecrementChannelValue();
+			channel_mp[currentChannelNum_m]->Set(currentChannelValue_m);
 			break;
 		case 4: // Return to previous menu
 			return callingMenu_m;
@@ -144,19 +148,24 @@ menuType RelayMenu::HandleSelectRight ()
 			currentChannelValue_m = channel_mp[currentChannelNum_m]->Get();
 			break;
 		case 3: // Increment channel value
-			DecrementChannelValue();
-			channel_mp[RelayValueToInt(currentChannelValue_m)]->Set(currentChannelValue_m);
+			IncrementChannelValue();
+			channel_mp[currentChannelNum_m]->Set(currentChannelValue_m);
 			break;
 		case 4: // We only allow a select left to return to the previous menu
 			// return callingMenu_m;
 		default:
 			return DIGITAL_RELAY;
 	};
-	
-	// This is now done in the main loop
-	// UpdateDisplay();
-	
+		
 	return DIGITAL_RELAY;
+}
+
+void RelayMenu::SetRelayTableEntry (int index, Relay * pointer)
+{
+	// Don't leak the object already pointed to by the table entry...
+	delete channel_mp[index - 1];
+	
+	channel_mp[index - 1] = pointer;
 }
 
 void RelayMenu::UpdateDisplay ()
@@ -172,7 +181,7 @@ void RelayMenu::UpdateDisplay ()
 	
 	dsLCD->Clear();
 	dsLCD->PrintfLine(LCD1, "RELAY");
-	dsLCD->PrintfLine(LCD2, " Channel: %d", currentChannelNum_m);
+	dsLCD->PrintfLine(LCD2, " Channel: %d", currentChannelNum_m + 1);
 	dsLCD->PrintfLine(LCD3, " Set: %s", valueStrings[currentValue]);
 	dsLCD->PrintfLine(LCD4, " Back");
 	dsLCD->Printf(IndexToLCDLine(index_m), 1, "*");
