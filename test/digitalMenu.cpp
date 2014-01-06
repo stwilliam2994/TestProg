@@ -49,6 +49,7 @@ menuType DigitalMenu::HandleSelectRight ()
 		return DIGITAL_PWM;
 		break;
 	case 4:
+		return DIGITAL_RELAY;
 		break;
 	case 5:
 		break;

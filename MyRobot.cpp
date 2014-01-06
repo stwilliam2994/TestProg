@@ -18,23 +18,23 @@
 
 class RobotDemo : public SimpleRobot
 {
-	Jaguar     leftMotor;
-	Jaguar     rightMotor;
-	RobotDrive myRobot;   // robot drive system
-	Joystick   stick;     // only joystick
+//	Jaguar     leftMotor;
+//	Jaguar     rightMotor;
+//	RobotDrive myRobot;   // robot drive system
+//	Joystick   stick;     // only joystick
 	EGamepad   gamepad;   // for test mode
 	
 	DriverStationLCD *dsLCD;
 
 public:
 	RobotDemo(void):
-		leftMotor (LEFT_DRIVE_PWM),
-		rightMotor(RIGHT_DRIVE_PWM),
-		myRobot(&leftMotor, &rightMotor),	// these must be initialized in the same order
-		stick(1),		// as they are declared above.
+//		leftMotor (LEFT_DRIVE_PWM),
+//		rightMotor(RIGHT_DRIVE_PWM),
+//		myRobot(&leftMotor, &rightMotor),	// these must be initialized in the same order
+//		stick(1),		// as they are declared above.
 		gamepad(3)
 	{
-		myRobot.SetExpiration(0.1);
+//		myRobot.SetExpiration(0.1);
 		//myRobot.SetSafetyEnabled(false);
 		
 		dsLCD = DriverStationLCD::GetInstance();
@@ -46,7 +46,7 @@ public:
 		// will not change.
 		
 		dsLCD->Clear();
-		dsLCD->PrintfLine(DriverStationLCD::kUser_Line1, "2013 Test");
+		dsLCD->PrintfLine(DriverStationLCD::kUser_Line1, "2013 Test Fix");
 		dsLCD->PrintfLine(DriverStationLCD::kUser_Line2, __DATE__ " "__TIME__);
 		dsLCD->UpdateLCD();
 	}
@@ -57,10 +57,10 @@ public:
 	
 	void Autonomous(void)
 	{
-		myRobot.SetSafetyEnabled(false);
-		myRobot.Drive(-0.5, 0.0); 	// drive forwards half speed
+//		myRobot.SetSafetyEnabled(false);
+//		myRobot.Drive(-0.5, 0.0); 	// drive forwards half speed
 		Wait(2.0); 					// for 2 seconds
-		myRobot.Drive(0.0, 0.0); 	// stop robot
+//		myRobot.Drive(0.0, 0.0); 	// stop robot
 	}
 
 	/**
@@ -69,10 +69,10 @@ public:
 	
 	void OperatorControl(void)
 	{
-		myRobot.SetSafetyEnabled(true);
+//		myRobot.SetSafetyEnabled(true);
 		while (IsOperatorControl())
 		{
-			myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
+//			myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
 			Wait(0.005);				// wait for a motor update time
 		}
 	}
@@ -108,8 +108,8 @@ public:
 		menus[DIGITAL_IO_ENCODER] = new BaseMenu;
 
 		// Inform appropriate menus of already allocated ports
-		menus[DIGITAL_PWM]->SetTableEntry (LEFT_DRIVE_PWM, &leftMotor);
-		menus[DIGITAL_PWM]->SetTableEntry (RIGHT_DRIVE_PWM, &rightMotor);
+//		menus[DIGITAL_PWM]->SetTableEntry (LEFT_DRIVE_PWM, &leftMotor);
+//		menus[DIGITAL_PWM]->SetTableEntry (RIGHT_DRIVE_PWM, &rightMotor);
 
 		// Write out the TOP menu for the first time
 		menus[currentMenu]->UpdateDisplay();

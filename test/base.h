@@ -284,9 +284,9 @@ public:
 	menuType HandleSelectRight ();
 	void     UpdateDisplay ();
 	
-	Relay::Value IncrementChannelValue ();
-	Relay::Value DecrementChannelValue ();
-	int          RelayValueToInt (Relay::Value value);
+	void IncrementChannelValue ();
+	void DecrementChannelValue ();
+	int  RelayValueToInt (Relay::Value value);
 
 	
 	int          currentChannelNum_m;

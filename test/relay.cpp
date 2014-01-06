@@ -2,7 +2,6 @@
 
 // RELAY Menu
 		
-	
 RelayMenu::RelayMenu()
 {
 	// The relay menu looks like this (not including the 1st 2 columns):
@@ -38,47 +37,47 @@ RelayMenu::~RelayMenu()
 	}
 }
 
-Relay::Value RelayMenu::IncrementChannelValue ()
+void RelayMenu::IncrementChannelValue ()
 {
 	switch (currentChannelValue_m)
 	{
 		case Relay::kOff:
-			return Relay::kOn;
+			currentChannelValue_m =  Relay::kOn;
 			break;
 		case Relay::kOn:
-			return Relay::kForward;
+			currentChannelValue_m =  Relay::kForward;
 			break;
 		case Relay::kForward:
-			return Relay::kReverse;
+			currentChannelValue_m =  Relay::kReverse;
 			break;
 		case Relay::kReverse:
-			return Relay::kOff;
+			currentChannelValue_m =  Relay::kOff;
 			break;
 		default:
 			// Should never get here. A swerr here WBN
-			return Relay::kOff;
+			currentChannelValue_m =  Relay::kOff;
 	}
 }
 
-Relay::Value RelayMenu::DecrementChannelValue ()
+void RelayMenu::DecrementChannelValue ()
 {
 	switch (currentChannelValue_m)
 	{
 		case Relay::kOff:
-			return Relay::kReverse;
+			currentChannelValue_m = Relay::kReverse;
 			break;
 		case Relay::kOn:
-			return Relay::kOff;
+			currentChannelValue_m =  Relay::kOff;
 			break;
 		case Relay::kForward:
-			return Relay::kOn;
+			currentChannelValue_m =  Relay::kOn;
 			break;
 		case Relay::kReverse:
-			return Relay::kForward;
+			currentChannelValue_m =  Relay::kForward;
 			break;
 		default:
 			// Should never get here. A swerr here WBN
-			return Relay::kOff;
+			currentChannelValue_m =  Relay::kOff;
 	}
 }
 
@@ -115,9 +114,9 @@ menuType RelayMenu::HandleSelectLeft ()
 			}
 			currentChannelValue_m = channel_mp[currentChannelNum_m]->Get();
 			break;
-		case 3: // Toggle channel value (it can only be true of false)
-			IncrementChannelValue();
-			channel_mp[RelayValueToInt(currentChannelValue_m)]->Set(currentChannelValue_m);
+		case 3: // Decrement channel value
+			DecrementChannelValue();
+			channel_mp[currentChannelNum_m]->Set(currentChannelValue_m);
 			break;
 		case 4: // Return to previous menu
 			return callingMenu_m;
@@ -133,6 +132,8 @@ menuType RelayMenu::HandleSelectLeft ()
 
 menuType RelayMenu::HandleSelectRight ()
 {
+	
+
 	switch (index_m)
 	{
 		case 2: // Increment channel pointer 
@@ -144,17 +145,14 @@ menuType RelayMenu::HandleSelectRight ()
 			currentChannelValue_m = channel_mp[currentChannelNum_m]->Get();
 			break;
 		case 3: // Increment channel value
-			DecrementChannelValue();
-			channel_mp[RelayValueToInt(currentChannelValue_m)]->Set(currentChannelValue_m);
+			IncrementChannelValue();
+			channel_mp[currentChannelNum_m]->Set(currentChannelValue_m);
 			break;
 		case 4: // We only allow a select left to return to the previous menu
 			// return callingMenu_m;
 		default:
 			return DIGITAL_RELAY;
 	};
-	
-	// This is now done in the main loop
-	// UpdateDisplay();
 	
 	return DIGITAL_RELAY;
 }
@@ -172,7 +170,7 @@ void RelayMenu::UpdateDisplay ()
 	
 	dsLCD->Clear();
 	dsLCD->PrintfLine(LCD1, "RELAY");
-	dsLCD->PrintfLine(LCD2, " Channel: %d", currentChannelNum_m);
+	dsLCD->PrintfLine(LCD2, " Channel: %d", currentChannelNum_m + 1);
 	dsLCD->PrintfLine(LCD3, " Set: %s", valueStrings[currentValue]);
 	dsLCD->PrintfLine(LCD4, " Back");
 	dsLCD->Printf(IndexToLCDLine(index_m), 1, "*");
