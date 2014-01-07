@@ -12,31 +12,15 @@
 // code is to enable the manipulation of individual channels on any of the modules using a menu-
 // driven interface which uses a few gamepad buttons and the LCD screen as its interface
 
-// PWM ports for robotDrive
-#define LEFT_DRIVE_PWM  1
-#define RIGHT_DRIVE_PWM 2
-
 class RobotDemo : public SimpleRobot
 {
-//	Jaguar     leftMotor;
-//	Jaguar     rightMotor;
-//	RobotDrive myRobot;   // robot drive system
-//	Joystick   stick;     // only joystick
-	EGamepad   gamepad;   // for test mode
-	
+	EGamepad          gamepad;   // for test mode
 	DriverStationLCD *dsLCD;
 
 public:
 	RobotDemo(void):
-//		leftMotor (LEFT_DRIVE_PWM),
-//		rightMotor(RIGHT_DRIVE_PWM),
-//		myRobot(&leftMotor, &rightMotor),	// these must be initialized in the same order
-//		stick(1),		// as they are declared above.
 		gamepad(3)
 	{
-//		myRobot.SetExpiration(0.1);
-		//myRobot.SetSafetyEnabled(false);
-		
 		dsLCD = DriverStationLCD::GetInstance();
 		
 		// Output the program name and build date/time in the hope that this will help
@@ -57,10 +41,10 @@ public:
 	
 	void Autonomous(void)
 	{
-//		myRobot.SetSafetyEnabled(false);
-//		myRobot.Drive(-0.5, 0.0); 	// drive forwards half speed
-		Wait(2.0); 					// for 2 seconds
-//		myRobot.Drive(0.0, 0.0); 	// stop robot
+		dsLCD->Clear();
+		dsLCD->PrintfLine(DriverStationLCD::kUser_Line1, "2013 Test Fix");
+		dsLCD->PrintfLine(DriverStationLCD::kUser_Line2, "Autonomous Mode");
+		dsLCD->UpdateLCD();
 	}
 
 	/**
@@ -69,11 +53,19 @@ public:
 	
 	void OperatorControl(void)
 	{
-//		myRobot.SetSafetyEnabled(true);
+		// Loop counter to ensure that the program us running (debug helper
+		// that can be removed when things get more stable)
+		int sanity = 0;
+
 		while (IsOperatorControl())
 		{
-//			myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
-			Wait(0.005);				// wait for a motor update time
+			dsLCD->Clear();
+			dsLCD->PrintfLine(DriverStationLCD::kUser_Line1, "2013 Test Fix");
+			dsLCD->PrintfLine(DriverStationLCD::kUser_Line2, "Teleop Mode");
+			dsLCD->PrintfLine(DriverStationLCD::kUser_Line6, "Sanity: %d", sanity);
+			dsLCD->UpdateLCD();
+			sanity++;
+			Wait(1.0);				// wait for a motor update time
 		}
 	}
 	
@@ -103,13 +95,9 @@ public:
 		menus[DIGITAL_PWM] = new PWMMenu;
 		menus[DIGITAL_IO] = new DigitalIOMenu;
 		menus[DIGITAL_RELAY] = new RelayMenu;
-		menus[DIGITAL_IO_STATE] = new BaseMenu;
+		menus[DIGITAL_IO_STATE] = new DigitalIOStateMenu;
 		menus[DIGITAL_IO_CLOCK] = new BaseMenu;
-		menus[DIGITAL_IO_ENCODER] = new BaseMenu;
-
-		// Inform appropriate menus of already allocated ports
-//		menus[DIGITAL_PWM]->SetTableEntry (LEFT_DRIVE_PWM, &leftMotor);
-//		menus[DIGITAL_PWM]->SetTableEntry (RIGHT_DRIVE_PWM, &rightMotor);
+		menus[DIGITAL_IO_ENCODER] = new DigitalIOEncoderMenu;
 
 		// Write out the TOP menu for the first time
 		menus[currentMenu]->UpdateDisplay();

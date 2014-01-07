@@ -167,6 +167,7 @@ public:
 // ----------------------------------------------------------------------------
 
 #define NUM_DIO_CHANNELS 14
+#define MIN_DIO_CHANNEL  0
 
 // To get around the fact that we do not have a common base class through which
 // we can have a single pointer to point to either an input or an output we have
@@ -187,7 +188,9 @@ public:
 	~DigitalIO ();
 	
 	bool IsInput (int channel);
+	void SetToInput (int channel, bool input);
 	void SetDirection (int channel, bool input);
+	DigitalSource * GetPointer (int channel);
 	bool GetValue (int channel);
 	void SetValue (int channel, bool value);
 	
@@ -292,6 +295,54 @@ public:
 	int          currentChannelNum_m;
 	Relay::Value currentChannelValue_m;
 	Relay *      channel_mp[MAX_RELAY_CHANNEL + 1];
+};
+
+// ----------------------------------------------------------------------------
+// Digital IO State menu
+// ----------------------------------------------------------------------------
+
+class DigitalIOStateMenu : public BaseMenu
+{	
+public:
+	         DigitalIOStateMenu ();
+	virtual ~DigitalIOStateMenu();
+	
+	void     doIndexUp ();
+	void     doIndexDown ();
+	menuType HandleSelectLeft ();
+	menuType HandleSelectRight ();
+	void     UpdateDisplay ();
+	
+	int  currentChannelNum_m;
+	bool currentChannelValue_m;
+	
+	DigitalIO * digitalIO_mp;
+};
+
+// ----------------------------------------------------------------------------
+// DIGITAL_IO_ENCODER menu
+// ----------------------------------------------------------------------------
+
+class DigitalIOEncoderMenu : public BaseMenu
+{
+public:
+	DigitalIOEncoderMenu ();
+	virtual ~DigitalIOEncoderMenu();
+	
+	void     doIndexUp ();
+	void     doIndexDown ();
+	menuType HandleSelectLeft ();
+	menuType HandleSelectRight ();
+	void     UpdateDisplay ();
+	
+	void CreateAndStartEncoder();
+	void StopAndDestroyEncoder();
+
+	int currentChannelNumA_m;
+	int currentChannelNumB_m;
+	
+	Encoder *   encoder_mp;
+	DigitalIO * digitalIO_mp;
 };
 
 #endif
