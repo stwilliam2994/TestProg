@@ -30,13 +30,14 @@ public:
 		// will not change.
 		
 		dsLCD->Clear();
-		dsLCD->PrintfLine(DriverStationLCD::kUser_Line1, "2013 Test Fix");
+		dsLCD->PrintfLine(DriverStationLCD::kUser_Line1, "2013 Test Menu");
 		dsLCD->PrintfLine(DriverStationLCD::kUser_Line2, __DATE__ " "__TIME__);
 		dsLCD->UpdateLCD();
 	}
 
 	/**
-	 * Drive left & right motors for 2 seconds then stop
+	 * Output a message to the LCD to let users know they have strayed
+	 * into a useless mode
 	 */
 	
 	void Autonomous(void)
@@ -48,7 +49,8 @@ public:
 	}
 
 	/**
-	 * Runs the motors with arcade steering. 
+	 * Output a message to the LCD to let users know they have strayed
+	 * into a useless mode
 	 */
 	
 	void OperatorControl(void)
@@ -78,7 +80,16 @@ public:
 	// one of the IO modules plugged into the cRIO. 
 	// See base.h for a description of the test menu hierarchy
 
-	// <need to describe the menu hierarchy and user interface here>
+	// Simplified User's guide:
+	// dpad up   : move the cursor up one menu item
+	// dpad down : move the cursor down one menu item
+	// dpad left : decrement the value in the selected menu item or
+	//             return to the previous menu if the menu item is "Back"
+	// dpad right: increment the value in the selected menu item or
+	//             enter a submenu (as appropriate)
+	// gamepad right joystick: control the configured and enabled PWM ports
+	//               (Top->Digital->PWM)
+	
 	void Test() 
 	{
 		menuType currentMenu = TOP;
@@ -86,8 +97,6 @@ public:
 		
 		BaseMenu * menus[NUM_MENU_TYPE];
 		
-		// <Really should default everything to BaseMEnu via a loop and then make 
-		// indicidual assignments>
 		menus[TOP] = new TopMenu;
 		menus[ANALOG] = new AnalogMenu;
 		menus[DIGITAL_TOP] = new DigitalMenu;
@@ -96,7 +105,7 @@ public:
 		menus[DIGITAL_IO] = new DigitalIOMenu;
 		menus[DIGITAL_RELAY] = new RelayMenu;
 		menus[DIGITAL_IO_STATE] = new DigitalIOStateMenu;
-		menus[DIGITAL_IO_CLOCK] = new BaseMenu;
+		menus[DIGITAL_IO_CLOCK] = new DigitalIOClockMenu;
 		menus[DIGITAL_IO_ENCODER] = new DigitalIOEncoderMenu;
 
 		// Write out the TOP menu for the first time

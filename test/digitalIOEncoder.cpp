@@ -4,7 +4,7 @@
 	
 // Notes:
 // 1. This menu allows you to change the direction of a digital IO port created
-//    elsewhere in the program (telop or autonomous modes) so be careful
+//    elsewhere in the program so be careful
 // 2. Any change to the ports being used for the encoder (or leaving this menu)
 //    causes the encoder object to be disabled and deleted to isolate this menu
 //    from the other digital IO menus
@@ -15,16 +15,16 @@ DigitalIOEncoderMenu::DigitalIOEncoderMenu()
 	// 1:Digitial IO encoder
 	// 2: Channel A: #
 	// 3: Channel B: #
-	// 4: Enabled:
+	// 4: En: $$$ Cnt: ####
 	// 5: Back
-	// 6:Count: ##
+	// 6:
 	
 	index_m    = 2;
 	maxIndex_m = 5;
 	
-	// Start out with channel 0 for each
+	// Start out with channel 0 and 1
 	currentChannelNumA_m   = 0;
-	currentChannelNumB_m   = 0;
+	currentChannelNumB_m   = 1;
 	
 	encoder_mp   = NULL;
 	digitalIO_mp = DigitalIO::GetInstance();
@@ -42,9 +42,11 @@ void DigitalIOEncoderMenu::CreateAndStartEncoder()
 		digitalIO_mp->SetToInput(currentChannelNumA_m, true);
 		digitalIO_mp->SetToInput(currentChannelNumB_m, true);
 	
-		DigitalSource * channelA = digitalIO_mp->GetPointer(currentChannelNumA_m);
-		DigitalSource * channelB = digitalIO_mp->GetPointer(currentChannelNumB_m);
+		DigitalSource * channelA = digitalIO_mp->GetInputPointer(currentChannelNumA_m);
+		DigitalSource * channelB = digitalIO_mp->GetInputPointer(currentChannelNumB_m);
 		
+		// Really should check for NULL channelA or channelB and SWERR (as well as not
+		// enabling the encoder)
 		encoder_mp = new Encoder (channelA, channelB);
 		encoder_mp->Start();
 	}
@@ -67,20 +69,40 @@ menuType DigitalIOEncoderMenu::HandleSelectLeft ()
 		case 2: // Decrement channel A port number 
 			StopAndDestroyEncoder();
 			currentChannelNumA_m--;
+			// Make sure channels A and B are never the same
+			if (currentChannelNumA_m == currentChannelNumB_m)
+			{
+				currentChannelNumA_m--;
+			}
 			if (currentChannelNumA_m < MIN_DIO_CHANNEL)
 			{
 				currentChannelNumA_m = NUM_DIO_CHANNELS - 1;
+				// Make sure channels A and B are never the same
+				if (currentChannelNumA_m == currentChannelNumB_m)
+				{
+					currentChannelNumA_m--;
+				}
 			}
 			break;
 		case 3: // Decrement channel B number
 			StopAndDestroyEncoder();
 			currentChannelNumB_m--;
+			// Make sure channels A and B are never the same
+			if (currentChannelNumB_m == currentChannelNumA_m)
+			{
+				currentChannelNumB_m--;
+			}
 			if (currentChannelNumB_m < MIN_DIO_CHANNEL)
 			{
 				currentChannelNumB_m = NUM_DIO_CHANNELS - 1;
+				// Make sure channels A and B are never the same
+				if (currentChannelNumB_m == currentChannelNumA_m)
+				{
+					currentChannelNumB_m--;
+				}
 			}
 			break;
-		case 4: //  Enable/disable
+		case 4: //  Toggle the enabled state
 			if (!encoder_mp)
 			{
 				CreateAndStartEncoder();
@@ -95,9 +117,8 @@ menuType DigitalIOEncoderMenu::HandleSelectLeft ()
 			return callingMenu_m;
 			break;
 		default:
-			return DIGITAL_IO_ENCODER;
-	};
-		
+			break;
+	}
 	return DIGITAL_IO_ENCODER;
 }
 
@@ -108,20 +129,40 @@ menuType DigitalIOEncoderMenu::HandleSelectRight ()
 		case 2: // Increment channel A number 
 			StopAndDestroyEncoder();
 			currentChannelNumA_m++;
+			// Make sure channels A and B are never the same
+			if (currentChannelNumA_m == currentChannelNumB_m)
+			{
+				currentChannelNumA_m++;
+			}
 			if (currentChannelNumA_m >= NUM_DIO_CHANNELS)
 			{
 				currentChannelNumA_m = MIN_DIO_CHANNEL;
+				// Make sure channels A and B are never the same
+				if (currentChannelNumA_m == currentChannelNumB_m)
+				{
+					currentChannelNumA_m++;
+				}
 			}
 			break;
 		case 3: // Decrement channel value
 			StopAndDestroyEncoder();
 			currentChannelNumB_m++;
+			// Make sure channels A and B are never the same
+			if (currentChannelNumB_m == currentChannelNumA_m)
+			{
+				currentChannelNumB_m++;
+			}
 			if (currentChannelNumB_m >= NUM_DIO_CHANNELS)
 			{
 				currentChannelNumB_m = MIN_DIO_CHANNEL;
+				// Make sure channels A and B are never the same
+				if (currentChannelNumB_m == currentChannelNumA_m)
+				{
+					currentChannelNumB_m++;
+				}
 			}
 			break;
-		case 4: // Toggle the enabled flag
+		case 4: // Toggle the enabled state
 			if (!encoder_mp)
 			{
 				CreateAndStartEncoder();
@@ -131,12 +172,9 @@ menuType DigitalIOEncoderMenu::HandleSelectRight ()
 				StopAndDestroyEncoder();
 			}
 			break;
-		case 5: // Only select left is allowed to return to calling menu
-			break;
 		default:
-			return DIGITAL_IO_ENCODER;
-	};
-	
+			break;
+	}
 	return DIGITAL_IO_ENCODER;
 }
 

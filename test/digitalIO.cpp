@@ -90,7 +90,7 @@ void DigitalIO::SetValue (int channel, bool value)
 	}
 }
 
-DigitalSource * DigitalIO::GetPointer (int channel)
+DigitalSource * DigitalIO::GetInputPointer (int channel)
 {
 	if (IsInput(channel))
 	{
@@ -98,7 +98,7 @@ DigitalSource * DigitalIO::GetPointer (int channel)
 	}
 	else
 	{
-		return DIOTable_mp[channel].DigitalOutput_p; 
+		return NULL; 
 	}
 }
 

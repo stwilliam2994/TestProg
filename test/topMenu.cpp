@@ -2,7 +2,6 @@
 
 // Top Menu
 
-
 TopMenu::TopMenu()
 {
 	// The top menu looks like this (not including the first two columns
@@ -19,7 +18,6 @@ TopMenu::TopMenu()
 
 menuType TopMenu::HandleSelectLeft ()
 {
-	//return HandleSelect();
 	// We've decided that selecting a submenu should be right
 	// button, exiting a submenu (returning to the parent menu
 	// via the back button) should be left button only

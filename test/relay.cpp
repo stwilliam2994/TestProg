@@ -22,9 +22,6 @@ RelayMenu::RelayMenu()
 	// (note that relay channels are numbered 1->8 in the API but 0->7 here)
 	for (int i=0; i <= MAX_RELAY_CHANNEL; i++)
 	{
-		// Need to assign from existing pointers here if and relay ports are already
-		// allocated in the the main RobotDemo constructor!
-
 		channel_mp[i] = new Relay(i + 1);
 	}
 }
@@ -121,19 +118,13 @@ menuType RelayMenu::HandleSelectLeft ()
 		case 4: // Return to previous menu
 			return callingMenu_m;
 		default:
-			return DIGITAL_RELAY;
-	};
-	
-	// This is now done in the main loop
-	// UpdateDisplay();
-	
+			break;
+	}
 	return DIGITAL_RELAY;
 }
 
 menuType RelayMenu::HandleSelectRight ()
 {
-	
-
 	switch (index_m)
 	{
 		case 2: // Increment channel pointer 
@@ -148,12 +139,9 @@ menuType RelayMenu::HandleSelectRight ()
 			IncrementChannelValue();
 			channel_mp[currentChannelNum_m]->Set(currentChannelValue_m);
 			break;
-		case 4: // We only allow a select left to return to the previous menu
-			// return callingMenu_m;
 		default:
-			return DIGITAL_RELAY;
-	};
-	
+			break;
+	}
 	return DIGITAL_RELAY;
 }
 

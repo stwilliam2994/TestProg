@@ -56,9 +56,8 @@ menuType DigitalIOStateMenu::HandleSelectLeft ()
 		case 5: // Return to previous menu
 			return callingMenu_m;
 		default:
-			return DIGITAL_IO_STATE;
-	};
-	
+			break;
+	}
 	return DIGITAL_IO_STATE;
 }
 
@@ -90,11 +89,9 @@ menuType DigitalIOStateMenu::HandleSelectRight ()
 				digitalIO_mp->SetValue(currentChannelNum_m, currentChannelValue_m);
 			}
 			break;
-		case 5: // We only allow a select left to return to the previous menu
 		default:
-			return DIGITAL_IO_STATE;
-	};
-		
+			break;
+	}
 	return DIGITAL_IO_STATE;
 }
 

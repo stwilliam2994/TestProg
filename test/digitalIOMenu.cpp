@@ -40,11 +40,10 @@ menuType DigitalIOMenu::HandleSelectRight ()
 		return DIGITAL_IO_STATE;
 		break;
 	case 3:
+		return DIGITAL_IO_CLOCK;
 		break;
 	case 4:
 		return DIGITAL_IO_ENCODER;
-		break;
-	case 5:
 		break;
 	default:
 		break;
