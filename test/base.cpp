@@ -52,14 +52,6 @@ menuType BaseMenu::HandleSelectRight ()
 	return TOP;
 }
 
-void BaseMenu::UpdateDisplay ()
-{
-	dsLCD->Clear();
-	dsLCD->PrintfLine(LCD1,  "Base Class!");
-	dsLCD->PrintfLine(LCD2,  "*Back");
-	dsLCD->UpdateLCD();
-}
-
 void BaseMenu::SetCallingMenu (menuType callingMenu)
 {
 	callingMenu_m = callingMenu;
@@ -75,8 +67,10 @@ void BaseMenu::SetSpeed (float speed)
 	
 }
 
-void BaseMenu::SetTableEntry (int index, Jaguar * pointer)
+void BaseMenu::UpdateDisplay ()
 {
-	
+	dsLCD->Clear();
+	dsLCD->PrintfLine(LCD1,  "Base Class!");
+	dsLCD->PrintfLine(LCD2,  "*Back");
+	dsLCD->UpdateLCD();
 }
-

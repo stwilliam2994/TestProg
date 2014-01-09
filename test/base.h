@@ -74,24 +74,28 @@ class BaseMenu
 {
 
 public:
-	BaseMenu();
+	         BaseMenu();
 	virtual ~BaseMenu ();
-	void HandleIndexUp ();
-	void HandleIndexDown ();
+	
+	void     HandleIndexUp ();
+	void     HandleIndexDown ();
+	
 	virtual  menuType HandleSelectLeft ();
 	virtual  menuType HandleSelectRight ();
+	
 	virtual void UpdateDisplay ();
 	virtual void SetSpeed (float speed);
-	virtual void SetTableEntry (int index, Jaguar * pointer);
 
 	void SetCallingMenu (menuType callingMenu);
+	
 	DriverStationLCD::Line IndexToLCDLine (int line);
 	
 	int index_m;
 	int maxIndex_m;
 	int minIndex_m;
-	menuType callingMenu_m;
-	DriverStationLCD *dsLCD;
+	
+	menuType           callingMenu_m;
+	DriverStationLCD * dsLCD;
 };
 
 // ----------------------------------------------------------------------------
@@ -151,6 +155,7 @@ class AnalogMenu : public BaseMenu
 public:
 	         AnalogMenu ();
 	virtual ~AnalogMenu();
+	
 	void     doIndexUp ();
 	void     doIndexDown ();
 	menuType HandleSelectLeft ();
@@ -158,7 +163,6 @@ public:
 	void     UpdateDisplay ();
 	
 	int             currentChannelNum_m;
-	// float           currentChannelValue_m;
 	AnalogChannel * channel_mp[MAX_ANALOG_CHANNEL + 1];
 };
 
@@ -167,6 +171,7 @@ public:
 // ----------------------------------------------------------------------------
 
 #define NUM_DIO_CHANNELS 14
+#define MIN_DIO_CHANNEL  0
 
 // To get around the fact that we do not have a common base class through which
 // we can have a single pointer to point to either an input or an output we have
@@ -187,10 +192,12 @@ public:
 	~DigitalIO ();
 	
 	bool IsInput (int channel);
-	void SetDirection (int channel, bool input);
+	void SetToInput (int channel, bool input);
 	bool GetValue (int channel);
 	void SetValue (int channel, bool value);
 	
+	DigitalSource * GetInputPointer (int channel);
+
 	static DigitalIO * GetInstance ();
 	
 private:
@@ -208,9 +215,10 @@ class DigitalMenu : public BaseMenu
 	
 public:
 	DigitalMenu ();
+	
 	menuType HandleSelectLeft ();
 	menuType HandleSelectRight ();
-	void UpdateDisplay ();
+	void     UpdateDisplay ();
 };
 
 // ----------------------------------------------------------------------------
@@ -229,25 +237,23 @@ typedef enum {
 	BOTH
 } enabledType;
 
-
 public:
-	PWMMenu ();
+	         PWMMenu ();
 	virtual ~PWMMenu();
-	void doIndexUp ();
-	void doIndexDown ();
+	
+	void     doIndexUp ();
+	void     doIndexDown ();
 	menuType HandleSelectLeft ();
 	menuType HandleSelectRight ();
-	void UpdateDisplay ();
+	void     UpdateDisplay ();
+	
 	void SetSpeed (float speed);
-	void SetTableEntry (int index, Jaguar * pointer);
-
 	
 	int currentChannelNumA_m;
 	int currentChannelNumB_m;
 	int enabled_m;
 	
 	Jaguar * channel_mp[MAX_PWM_CHANNEL + 1];
-
 };
 
 // ----------------------------------------------------------------------------
@@ -259,9 +265,10 @@ class DigitalIOMenu : public BaseMenu
 	
 public:
 	DigitalIOMenu ();
+	
 	menuType HandleSelectLeft ();
 	menuType HandleSelectRight ();
-	void UpdateDisplay ();
+	void     UpdateDisplay ();
 };
 
 // ----------------------------------------------------------------------------
@@ -284,14 +291,87 @@ public:
 	menuType HandleSelectRight ();
 	void     UpdateDisplay ();
 	
-	Relay::Value IncrementChannelValue ();
-	Relay::Value DecrementChannelValue ();
-	int          RelayValueToInt (Relay::Value value);
+	void IncrementChannelValue ();
+	void DecrementChannelValue ();
+	int  RelayValueToInt (Relay::Value value);
 
 	
 	int          currentChannelNum_m;
 	Relay::Value currentChannelValue_m;
 	Relay *      channel_mp[MAX_RELAY_CHANNEL + 1];
+};
+
+// ----------------------------------------------------------------------------
+// Digital IO State menu
+// ----------------------------------------------------------------------------
+
+class DigitalIOStateMenu : public BaseMenu
+{	
+public:
+	         DigitalIOStateMenu ();
+	virtual ~DigitalIOStateMenu();
+	
+	void     doIndexUp ();
+	void     doIndexDown ();
+	menuType HandleSelectLeft ();
+	menuType HandleSelectRight ();
+	void     UpdateDisplay ();
+	
+	int  currentChannelNum_m;
+	bool currentChannelValue_m;
+	
+	DigitalIO * digitalIO_mp;
+};
+
+// ----------------------------------------------------------------------------
+// DIGITAL_IO_ENCODER menu
+// ----------------------------------------------------------------------------
+
+class DigitalIOEncoderMenu : public BaseMenu
+{
+public:
+	         DigitalIOEncoderMenu ();
+	virtual ~DigitalIOEncoderMenu();
+	
+	void     doIndexUp ();
+	void     doIndexDown ();
+	menuType HandleSelectLeft ();
+	menuType HandleSelectRight ();
+	void     UpdateDisplay ();
+	
+	void CreateAndStartEncoder();
+	void StopAndDestroyEncoder();
+
+	int currentChannelNumA_m;
+	int currentChannelNumB_m;
+	
+	Encoder *   encoder_mp;
+	DigitalIO * digitalIO_mp;
+};
+
+// ----------------------------------------------------------------------------
+// DIGITAL_IO_CLOCK menu
+// ----------------------------------------------------------------------------
+
+class DigitalIOClockMenu : public BaseMenu
+{
+public:
+	         DigitalIOClockMenu ();
+	virtual ~DigitalIOClockMenu();
+	
+	void     doIndexUp ();
+	void     doIndexDown ();
+	menuType HandleSelectLeft ();
+	menuType HandleSelectRight ();
+	void     UpdateDisplay ();
+	
+	void CreateAndStartCounter();
+	void StopAndDestroyCounter();
+
+	int currentChannelNum_m;
+	
+	Counter *   counter_mp;
+	DigitalIO * digitalIO_mp;
 };
 
 #endif

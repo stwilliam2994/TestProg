@@ -18,7 +18,7 @@ PWMMenu::PWMMenu()
 	
 	// Start out with channel 0 for each
 	currentChannelNumA_m   = 0;
-	currentChannelNumB_m   = 0;
+	currentChannelNumB_m   = 1;
 	enabled_m = NEITHER;
 	
 	
@@ -43,28 +43,42 @@ PWMMenu::~PWMMenu()
 	}
 }
 
-void PWMMenu::SetTableEntry (int index, Jaguar * pointer)
-{
-	channel_mp[index] = pointer;
-	channel_mp[index]->SetExpiration(0.2);
-};
-
 menuType PWMMenu::HandleSelectLeft ()
 {
 	switch (index_m)
 	{
 		case 2: // Decrement channel A number 
 			currentChannelNumA_m--;
+			// Make sure channels A and B are never the same
+			if (currentChannelNumA_m == currentChannelNumB_m)
+			{
+				currentChannelNumA_m--;
+			}
 			if (currentChannelNumA_m < MIN_PWM_CHANNEL)
 			{
 				currentChannelNumA_m = MAX_PWM_CHANNEL;
+				// Make sure channels A and B are never the same
+				if (currentChannelNumA_m == currentChannelNumB_m)
+				{
+					currentChannelNumA_m--;
+				}
 			}
 			break;
 		case 3: // Decrement channel B number
 			currentChannelNumB_m--;
+			// Make sure channels A and B are never the same
+			if (currentChannelNumB_m == currentChannelNumA_m)
+			{
+				currentChannelNumB_m--;
+			}
 			if (currentChannelNumB_m < MIN_PWM_CHANNEL)
 			{
 				currentChannelNumB_m = MAX_PWM_CHANNEL;
+				// Make sure channels A and B are never the same
+				if (currentChannelNumB_m == currentChannelNumA_m)
+				{
+					currentChannelNumB_m--;
+				}
 			}
 			break;
 		case 4: // Decrement enabled flag
@@ -78,9 +92,8 @@ menuType PWMMenu::HandleSelectLeft ()
 			return callingMenu_m;
 			break;
 		default:
-			return DIGITAL_PWM;
-	};
-		
+			break;
+	}
 	return DIGITAL_PWM;
 }
 
@@ -90,16 +103,36 @@ menuType PWMMenu::HandleSelectRight ()
 	{
 		case 2: // Increment channel A number 
 			currentChannelNumA_m++;
+			// Make sure channels A and B are never the same
+			if (currentChannelNumA_m == currentChannelNumB_m)
+			{
+				currentChannelNumA_m++;
+			}
 			if (currentChannelNumA_m > MAX_PWM_CHANNEL)
 			{
 				currentChannelNumA_m = MIN_PWM_CHANNEL;
+				// Make sure channels A and B are never the same
+				if (currentChannelNumA_m == currentChannelNumB_m)
+				{
+					currentChannelNumA_m++;
+				}
 			}
 			break;
 		case 3: // Decrement channel value
 			currentChannelNumB_m++;
+			// Make sure channels A and B are never the same
+			if (currentChannelNumB_m == currentChannelNumA_m)
+			{
+				currentChannelNumB_m++;
+			}
 			if (currentChannelNumB_m > MAX_PWM_CHANNEL)
 			{
 				currentChannelNumB_m = MIN_PWM_CHANNEL;
+				// Make sure channels A and B are never the same
+				if (currentChannelNumB_m == currentChannelNumA_m)
+				{
+					currentChannelNumB_m++;
+				}
 			}
 			break;
 		case 4: // Increment the enabled flag
@@ -108,12 +141,9 @@ menuType PWMMenu::HandleSelectRight ()
 			{
 				enabled_m = NEITHER;
 			}
-		case 5: // Only select left is allowed to return to calling menu
-			break;
 		default:
-			return DIGITAL_PWM;
-	};
-	
+			break;
+	}
 	return DIGITAL_PWM;
 }
 
@@ -159,8 +189,8 @@ void PWMMenu::UpdateDisplay ()
 
 	dsLCD->Clear();
 	dsLCD->PrintfLine(LCD1, "PWM");
-	dsLCD->PrintfLine(LCD2, " Channel A: %d", chanA);
-	dsLCD->PrintfLine(LCD3, " Channel B: %d", chanB);
+	dsLCD->PrintfLine(LCD2, " Channel A: %d %5.2f", chanA, channel_mp[currentChannelNumA_m]->Get());
+	dsLCD->PrintfLine(LCD3, " Channel B: %d %5.2f", chanB, channel_mp[currentChannelNumB_m]->Get());
 	dsLCD->PrintfLine(LCD4, " Enabled: %s", enabledStrings[enabled_m]);
 	dsLCD->PrintfLine(LCD5, " Back");
 	dsLCD->Printf(IndexToLCDLine(index_m), 1, "*");

@@ -2,7 +2,6 @@
 
 // Solenoid Menu
 		
-	
 SolenoidMenu::SolenoidMenu()
 {
 	// The solenoid menu looks like this (not including the 1st 2 columns):
@@ -24,9 +23,6 @@ SolenoidMenu::SolenoidMenu()
 	// (note that solenoid channels are numbered 1->8 in the API but 0->7 on the module)
 	for (int i=0; i <= MAX_SOLENOID_CHANNEL; i++)
 	{
-		// Need to assign from existing pointers here if and solenoid ports are already
-		// allocated in the the main RobotDemo constructor!
-
 		channel_mp[i] = new Solenoid(i + 1);
 	}
 }
@@ -58,12 +54,8 @@ menuType SolenoidMenu::HandleSelectLeft ()
 		case 4: // Return to previous menu
 			return callingMenu_m;
 		default:
-			return SOLENOID;
-	};
-	
-	// This is now done in the main loop
-	// UpdateDisplay();
-	
+			break;
+	}
 	return SOLENOID;
 }
 
@@ -81,17 +73,11 @@ menuType SolenoidMenu::HandleSelectRight ()
 			break;
 		case 3: // Increment channel value
 			currentChannelValue_m = !currentChannelValue_m;
-			channel_mp[currentChannelNum_m]->Set(currentChannelValue_m + 1);
+			channel_mp[currentChannelNum_m]->Set(currentChannelValue_m);
 			break;
-		case 4: // We only allow a select left to return to the previous menu
-			// return callingMenu_m;
 		default:
-			return SOLENOID;
-	};
-	
-	// This is now done in the main loop
-	// UpdateDisplay();
-	
+			break;
+	}
 	return SOLENOID;
 }
 

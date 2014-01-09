@@ -42,10 +42,10 @@ DigitalIO::~DigitalIO ()
 
 bool DigitalIO::IsInput (int channel)
 {
-	return (NULL == DIOTable_mp[channel].DigitalInput_p);
+	return (NULL == DIOTable_mp[channel].DigitalOutput_p);
 }
 
-void DigitalIO::SetDirection (int channel, bool input)
+void DigitalIO::SetToInput (int channel, bool input)
 {
 	if (input)
 	{
@@ -87,6 +87,18 @@ void DigitalIO::SetValue (int channel, bool value)
 	else
 	{
 		return DIOTable_mp[channel].DigitalOutput_p->Set(value); 
+	}
+}
+
+DigitalSource * DigitalIO::GetInputPointer (int channel)
+{
+	if (IsInput(channel))
+	{
+		return DIOTable_mp[channel].DigitalInput_p; ;
+	}
+	else
+	{
+		return NULL; 
 	}
 }
 

@@ -12,31 +12,15 @@
 // code is to enable the manipulation of individual channels on any of the modules using a menu-
 // driven interface which uses a few gamepad buttons and the LCD screen as its interface
 
-// PWM ports for robotDrive
-#define LEFT_DRIVE_PWM  1
-#define RIGHT_DRIVE_PWM 2
-
 class RobotDemo : public SimpleRobot
 {
-	Jaguar     leftMotor;
-	Jaguar     rightMotor;
-	RobotDrive myRobot;   // robot drive system
-	Joystick   stick;     // only joystick
-	EGamepad   gamepad;   // for test mode
-	
+	EGamepad          gamepad;   // for test mode
 	DriverStationLCD *dsLCD;
 
 public:
 	RobotDemo(void):
-		leftMotor (LEFT_DRIVE_PWM),
-		rightMotor(RIGHT_DRIVE_PWM),
-		myRobot(&leftMotor, &rightMotor),	// these must be initialized in the same order
-		stick(1),		// as they are declared above.
 		gamepad(3)
 	{
-		myRobot.SetExpiration(0.1);
-		//myRobot.SetSafetyEnabled(false);
-		
 		dsLCD = DriverStationLCD::GetInstance();
 		
 		// Output the program name and build date/time in the hope that this will help
@@ -46,34 +30,44 @@ public:
 		// will not change.
 		
 		dsLCD->Clear();
-		dsLCD->PrintfLine(DriverStationLCD::kUser_Line1, "2013 Test");
+		dsLCD->PrintfLine(DriverStationLCD::kUser_Line1, "2013 Test Menu");
 		dsLCD->PrintfLine(DriverStationLCD::kUser_Line2, __DATE__ " "__TIME__);
 		dsLCD->UpdateLCD();
 	}
 
 	/**
-	 * Drive left & right motors for 2 seconds then stop
+	 * Output a message to the LCD to let users know they have strayed
+	 * into a useless mode
 	 */
 	
 	void Autonomous(void)
 	{
-		myRobot.SetSafetyEnabled(false);
-		myRobot.Drive(-0.5, 0.0); 	// drive forwards half speed
-		Wait(2.0); 					// for 2 seconds
-		myRobot.Drive(0.0, 0.0); 	// stop robot
+		dsLCD->Clear();
+		dsLCD->PrintfLine(DriverStationLCD::kUser_Line1, "2013 Test Fix");
+		dsLCD->PrintfLine(DriverStationLCD::kUser_Line2, "Autonomous Mode");
+		dsLCD->UpdateLCD();
 	}
 
 	/**
-	 * Runs the motors with arcade steering. 
+	 * Output a message to the LCD to let users know they have strayed
+	 * into a useless mode
 	 */
 	
 	void OperatorControl(void)
 	{
-		myRobot.SetSafetyEnabled(true);
+		// Loop counter to ensure that the program us running (debug helper
+		// that can be removed when things get more stable)
+		int sanity = 0;
+
 		while (IsOperatorControl())
 		{
-			myRobot.ArcadeDrive(stick); // drive with arcade style (use right stick)
-			Wait(0.005);				// wait for a motor update time
+			dsLCD->Clear();
+			dsLCD->PrintfLine(DriverStationLCD::kUser_Line1, "2013 Test Fix");
+			dsLCD->PrintfLine(DriverStationLCD::kUser_Line2, "Teleop Mode");
+			dsLCD->PrintfLine(DriverStationLCD::kUser_Line6, "Sanity: %d", sanity);
+			dsLCD->UpdateLCD();
+			sanity++;
+			Wait(1.0);				// wait for a motor update time
 		}
 	}
 	
@@ -86,7 +80,16 @@ public:
 	// one of the IO modules plugged into the cRIO. 
 	// See base.h for a description of the test menu hierarchy
 
-	// <need to describe the menu hierarchy and user interface here>
+	// Simplified User's guide:
+	// dpad up   : move the cursor up one menu item
+	// dpad down : move the cursor down one menu item
+	// dpad left : decrement the value in the selected menu item or
+	//             return to the previous menu if the menu item is "Back"
+	// dpad right: increment the value in the selected menu item or
+	//             enter a submenu (as appropriate)
+	// gamepad right joystick: control the configured and enabled PWM ports
+	//               (Top->Digital->PWM)
+	
 	void Test() 
 	{
 		menuType currentMenu = TOP;
@@ -94,8 +97,6 @@ public:
 		
 		BaseMenu * menus[NUM_MENU_TYPE];
 		
-		// <Really should default everything to BaseMEnu via a loop and then make 
-		// indicidual assignments>
 		menus[TOP] = new TopMenu;
 		menus[ANALOG] = new AnalogMenu;
 		menus[DIGITAL_TOP] = new DigitalMenu;
@@ -103,13 +104,9 @@ public:
 		menus[DIGITAL_PWM] = new PWMMenu;
 		menus[DIGITAL_IO] = new DigitalIOMenu;
 		menus[DIGITAL_RELAY] = new RelayMenu;
-		menus[DIGITAL_IO_STATE] = new BaseMenu;
-		menus[DIGITAL_IO_CLOCK] = new BaseMenu;
-		menus[DIGITAL_IO_ENCODER] = new BaseMenu;
-
-		// Inform appropriate menus of already allocated ports
-		menus[DIGITAL_PWM]->SetTableEntry (LEFT_DRIVE_PWM, &leftMotor);
-		menus[DIGITAL_PWM]->SetTableEntry (RIGHT_DRIVE_PWM, &rightMotor);
+		menus[DIGITAL_IO_STATE] = new DigitalIOStateMenu;
+		menus[DIGITAL_IO_CLOCK] = new DigitalIOClockMenu;
+		menus[DIGITAL_IO_ENCODER] = new DigitalIOEncoderMenu;
 
 		// Write out the TOP menu for the first time
 		menus[currentMenu]->UpdateDisplay();
