@@ -27,9 +27,7 @@
 // +  Digital IO State   +  +  Digital IO Clock   +   + Digital IO Encoder  +
 // +---------------------+  +---------------------+   +---------------------+
 
-// The complete list of menus in the test program.
-// *** If you add an item to this enum make sure you add a default assignment
-//     to the menu table in Test() in MyRobot.cpp ***
+// The complete list of menus in the test program
 typedef enum 
 {
 	TOP,				// Points to analog, digitalTop, and solenoid
@@ -71,40 +69,28 @@ typedef enum
 // menu-specific versions in all derived classes. We are creating the base 
 // class to allow us to use a base-class pointer to refer to any derived
 // class instance.
-//
-// This class is derived from ErrorBase to give us access to the error
-// reporting methods.
 
-class BaseMenu : public ErrorBase
+class BaseMenu
 {
+
 public:
-	         BaseMenu();
+	BaseMenu();
 	virtual ~BaseMenu ();
-	
 	void HandleIndexUp ();
 	void HandleIndexDown ();
-	
-	virtual menuType HandleSelectLeft ();
-	virtual menuType HandleSelectRight ();
-	virtual void     UpdateDisplay ();
-	
+	virtual  menuType HandleSelectLeft ();
+	virtual  menuType HandleSelectRight ();
+	virtual void UpdateDisplay ();
 	virtual void SetSpeed (float speed);
-	virtual void SetPWMTableEntry (int index, Jaguar * pointer);
-	virtual void SetAnalogTableEntry (int index, AnalogChannel * pointer);
-	virtual void SetDigitalInputTableEntry (int index, DigitalSource * pointer);
-	virtual void SetDigitalOutputTableEntry (int index, DigitalSource * pointer);
-	virtual void SetSolenoidPWMTableEntry (int index, Solenoid * pointer);
-	virtual void SetRelayTableEntry (int index, Relay * pointer);
+	virtual void SetTableEntry (int index, Jaguar * pointer);
 
 	void SetCallingMenu (menuType callingMenu);
-	
 	DriverStationLCD::Line IndexToLCDLine (int line);
 	
-	int      index_m;
-	int      maxIndex_m;
-	int      minIndex_m;
+	int index_m;
+	int maxIndex_m;
+	int minIndex_m;
 	menuType callingMenu_m;
-	
 	DriverStationLCD *dsLCD;
 };
 
@@ -114,14 +100,13 @@ public:
 
 class TopMenu : public BaseMenu
 {
+	
 public:
-	 TopMenu ();
-	~TopMenu ();
+	TopMenu ();
 	
 	menuType HandleSelectLeft ();
 	menuType HandleSelectRight ();
 	void     UpdateDisplay ();
-	
 private:
 	menuType HandleSelect ();
 };
@@ -134,7 +119,8 @@ private:
 #define MAX_SOLENOID_CHANNEL 7
 
 class SolenoidMenu : public BaseMenu
-{	
+{
+	
 public:
 	         SolenoidMenu ();
 	virtual ~SolenoidMenu();
@@ -145,10 +131,8 @@ public:
 	menuType HandleSelectRight ();
 	void     UpdateDisplay ();
 	
-	virtual void SetSolenoidPWMTableEntry (int index, Solenoid * pointer);
-
 	int        currentChannelNum_m;
-//	bool       currentChannelValue_m;
+	bool       currentChannelValue_m;
 	Solenoid * channel_mp[MAX_SOLENOID_CHANNEL + 1];
 };
 
@@ -156,26 +140,25 @@ public:
 // ANALOG menu
 // ----------------------------------------------------------------------------
 
+#define MIN_ANALOG_CHANNEL 0
 // The last channel is always used for batt voltage so we do not have 
 // access to it (hence our max channel is 6 not 7)
-#define MIN_ANALOG_CHANNEL 0
 #define MAX_ANALOG_CHANNEL 6 
 
 class AnalogMenu : public BaseMenu
-{	
+{
+	
 public:
 	         AnalogMenu ();
 	virtual ~AnalogMenu();
-	
 	void     doIndexUp ();
 	void     doIndexDown ();
 	menuType HandleSelectLeft ();
 	menuType HandleSelectRight ();
 	void     UpdateDisplay ();
 	
-	void AnalogMenu::SetAnalogTableEntry (int index, AnalogChannel * pointer);
-	
 	int             currentChannelNum_m;
+	// float           currentChannelValue_m;
 	AnalogChannel * channel_mp[MAX_ANALOG_CHANNEL + 1];
 };
 
@@ -184,7 +167,6 @@ public:
 // ----------------------------------------------------------------------------
 
 #define NUM_DIO_CHANNELS 14
-#define MIN_DIO_CHANNEL  0
 
 // To get around the fact that we do not have a common base class through which
 // we can have a single pointer to point to either an input or an output we have
@@ -201,18 +183,13 @@ typedef struct {
 class DigitalIO
 {
 public:
-	 DigitalIO ();
+	DigitalIO ();
 	~DigitalIO ();
 	
 	bool IsInput (int channel);
-	void SetToInput (int channel, bool input);
+	void SetDirection (int channel, bool input);
 	bool GetValue (int channel);
 	void SetValue (int channel, bool value);
-	
-	DigitalSource * DigitalIO::GetInputPointer (int channel);
-	
-	void SetDigitalInputTableEntry (int index, DigitalInput * pointer);
-	void SetDigitalOutputTableEntry (int index, DigitalOutput * pointer);
 	
 	static DigitalIO * GetInstance ();
 	
@@ -228,13 +205,12 @@ private:
 
 class DigitalMenu : public BaseMenu
 {
-public:
-	 DigitalMenu ();
-	~DigitalMenu ();
 	
+public:
+	DigitalMenu ();
 	menuType HandleSelectLeft ();
 	menuType HandleSelectRight ();
-	void     UpdateDisplay ();
+	void UpdateDisplay ();
 };
 
 // ----------------------------------------------------------------------------
@@ -253,25 +229,25 @@ typedef enum {
 	BOTH
 } enabledType;
 
+
 public:
-	         PWMMenu ();
+	PWMMenu ();
 	virtual ~PWMMenu();
-	
-	void     doIndexUp ();
-	void     doIndexDown ();
+	void doIndexUp ();
+	void doIndexDown ();
 	menuType HandleSelectLeft ();
 	menuType HandleSelectRight ();
-	void     UpdateDisplay ();
-	
+	void UpdateDisplay ();
 	void SetSpeed (float speed);
-	void SetPWMTableEntry (int index, Jaguar * pointer);
+	void SetTableEntry (int index, Jaguar * pointer);
 
+	
 	int currentChannelNumA_m;
 	int currentChannelNumB_m;
 	int enabled_m;
 	
-	// Any motor controller should be fine. The Jag is our old friend, so...
 	Jaguar * channel_mp[MAX_PWM_CHANNEL + 1];
+
 };
 
 // ----------------------------------------------------------------------------
@@ -279,14 +255,13 @@ public:
 // ----------------------------------------------------------------------------
 
 class DigitalIOMenu : public BaseMenu
-{	
-public:
-	 DigitalIOMenu ();
-	~DigitalIOMenu ();
+{
 	
+public:
+	DigitalIOMenu ();
 	menuType HandleSelectLeft ();
 	menuType HandleSelectRight ();
-	void     UpdateDisplay ();
+	void UpdateDisplay ();
 };
 
 // ----------------------------------------------------------------------------
@@ -297,7 +272,8 @@ public:
 #define MAX_RELAY_CHANNEL 7
 
 class RelayMenu : public BaseMenu
-{	
+{
+	
 public:
 	         RelayMenu ();
 	virtual ~RelayMenu();
@@ -311,58 +287,12 @@ public:
 	Relay::Value IncrementChannelValue ();
 	Relay::Value DecrementChannelValue ();
 	int          RelayValueToInt (Relay::Value value);
-	void         SetRelayTableEntry (int index, Relay * pointer);
 
+	
 	int          currentChannelNum_m;
 	Relay::Value currentChannelValue_m;
 	Relay *      channel_mp[MAX_RELAY_CHANNEL + 1];
 };
 
-// ----------------------------------------------------------------------------
-// Digital IO State menu
-// ----------------------------------------------------------------------------
-
-class DigitalIOStateMenu : public BaseMenu
-{	
-public:
-	         DigitalIOStateMenu ();
-	virtual ~DigitalIOStateMenu();
-	
-	void     doIndexUp ();
-	void     doIndexDown ();
-	menuType HandleSelectLeft ();
-	menuType HandleSelectRight ();
-	void     UpdateDisplay ();
-	
-	int  currentChannelNum_m;
-	bool currentChannelValue_m;
-	
-	DigitalIO * digitalIO_mp;
-};
-
-// ----------------------------------------------------------------------------
-// DIGITAL_IO_ENCODER menu
-// ----------------------------------------------------------------------------
-
-class DigitalIOEncoderMenu : public BaseMenu
-{
-public:
-	         DigitalIOEncoderMenu ();
-	virtual ~DigitalIOEncoderMenu();
-	
-	void     doIndexUp ();
-	void     doIndexDown ();
-	menuType HandleSelectLeft ();
-	menuType HandleSelectRight ();
-	void     UpdateDisplay ();
-	
-	void DigitalIOEncoderMenu::CreateAndStartEncoder();
-	void DigitalIOEncoderMenu::StopAndDestroyEncoder();
-
-	int currentChannelNumA_m;
-	int currentChannelNumB_m;
-	
-	Encoder *   encoder_mp;
-	DigitalIO * digitalIO_mp;
-};
 #endif
+

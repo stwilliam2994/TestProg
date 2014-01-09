@@ -17,11 +17,6 @@ DigitalMenu::DigitalMenu()
 	maxIndex_m = 5;
 }
 
-DigitalMenu::~DigitalMenu()
-{
-
-}
-
 menuType DigitalMenu::HandleSelectLeft ()
 {
 	switch (index_m) 

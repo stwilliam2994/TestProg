@@ -11,9 +11,9 @@ DigitalIO::DigitalIO ()
 {
 	for (UINT32 i = 0; i < NUM_DIO_CHANNELS; i++)
 	{
-		// Need to assign from existing pointers here if any digital IO ports are already
-		// allocated in the the main RobotDemo constructor! Use SetDigital...TableEntry to
-		// overide any of the entries in this table as required.
+		// Need to assign from existing pointers here if and digital IO ports 
+		// are already allocated in the the main RobotDemo constructor!
+
 		DIOTable_mp[i].DigitalInput_p  = new DigitalInput (i + 1);
 		DIOTable_mp[i].DigitalOutput_p = NULL;
 	}
@@ -21,13 +21,9 @@ DigitalIO::DigitalIO ()
 
 DigitalIO::~DigitalIO ()
 {
-	// This will delete any objects added to the table by SetDigital...TableEntry without
-	// the original creator knowing about it. However, this destructor won't ever
-	// be called in the current program. However, just in case this code gets used
-	// elsewhere...
-
 	// Paranoia. Even though only one OR the other should ever be
 	// nonNULL, we check both.
+	
 	for (UINT32 i = 0; i < NUM_DIO_CHANNELS; i++)
 	{
 		if (NULL != DIOTable_mp[i].DigitalInput_p)
@@ -40,14 +36,16 @@ DigitalIO::~DigitalIO ()
 			delete DIOTable_mp[i].DigitalOutput_p;
 		}	
 	}
+	
+	// Don't forget to delete instance_m
 };
 
 bool DigitalIO::IsInput (int channel)
 {
-	return (NULL != DIOTable_mp[channel].DigitalInput_p);
+	return (NULL == DIOTable_mp[channel].DigitalInput_p);
 }
 
-void DigitalIO::SetToInput (int channel, bool input)
+void DigitalIO::SetDirection (int channel, bool input)
 {
 	if (input)
 	{
@@ -68,7 +66,6 @@ void DigitalIO::SetToInput (int channel, bool input)
 		}
 	}
 }
-
 bool DigitalIO::GetValue (int channel)
 {
 	if (IsInput(channel))
@@ -83,40 +80,14 @@ bool DigitalIO::GetValue (int channel)
 
 void DigitalIO::SetValue (int channel, bool value)
 {
-	if (!IsInput(channel))
+	if (IsInput(channel))
 	{
-		 DIOTable_mp[channel].DigitalOutput_p->Set(value); 
+		return;
 	}
-}
-
-DigitalSource * DigitalIO::GetInputPointer (int channel)
-{
-	return DIOTable_mp[channel].DigitalInput_p;
-}
-
-// This code assumes it will be called after the constructor (which sets all
-// digital IOs to inputs) but before any menus are actually accessed (which
-// might change the inputs to outputs). If you call this after the menus
-// are used, all bets are off.
-void DigitalIO::SetDigitalInputTableEntry (int index, DigitalInput * pointer)
-{
-	// Don't leak the object already pointed to by the table entry...
-	delete DIOTable_mp[index - 1].DigitalInput_p;
-	
-	DIOTable_mp[index - 1].DigitalInput_p  = pointer;
-}
-
-// This code assumes it will be called after the constructor (which sets all
-// digital IOs to inputs) but before any menus are actually accessed (which
-// might change the inputs to outputs). If you call this after the menus
-// are used, all bets are off.
-void DigitalIO::SetDigitalOutputTableEntry (int index, DigitalOutput * pointer)
-{
-	// Don't leak the object already pointed to by the table entry...
-	delete DIOTable_mp[index - 1].DigitalInput_p;
-	DIOTable_mp[index - 1].DigitalInput_p  = NULL;
-	
-	DIOTable_mp[index - 1].DigitalOutput_p = pointer;
+	else
+	{
+		return DIOTable_mp[channel].DigitalOutput_p->Set(value); 
+	}
 }
 
 DigitalIO * DigitalIO::GetInstance ()

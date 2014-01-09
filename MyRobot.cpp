@@ -30,9 +30,9 @@ public:
 	RobotDemo(void):
 		leftMotor (LEFT_DRIVE_PWM),
 		rightMotor(RIGHT_DRIVE_PWM),
-		myRobot(&leftMotor, &rightMotor),	// Using this constructor to allow us
-		stick(1),							// to have pointers to the motor controllers
-		gamepad(3)							
+		myRobot(&leftMotor, &rightMotor),	// these must be initialized in the same order
+		stick(1),		// as they are declared above.
+		gamepad(3)
 	{
 		myRobot.SetExpiration(0.1);
 		//myRobot.SetSafetyEnabled(false);
@@ -80,27 +80,22 @@ public:
 	/**
 	 * Run the test program
 	 */
-	
 	// The test program is organized as a set of hierarchical menus that are
 	// displayed on the LCD on the driver station. Each menu is either a set
 	// of submenus or is a menu controlling the use of a port (or ports) on 
-	// one of the IO modules plugged into the cRIO. The gamepad D-Pad is used
-	// to navigate the menus:
-	// Up    - move up on menu item
-	// Down  - move down one menu iteme
-	// Left  - decrease a menu item value or return to previous menu
-	//         if at the "back" menu item
-	// Right - increase a menu item or enter the selected submenu
+	// one of the IO modules plugged into the cRIO. 
 	// See base.h for a description of the test menu hierarchy
 
+	// <need to describe the menu hierarchy and user interface here>
 	void Test() 
 	{
 		menuType currentMenu = TOP;
 		menuType newMenu     = TOP;
 		
-		// We use a table of pointers to menu objects - one for each menu.
 		BaseMenu * menus[NUM_MENU_TYPE];
 		
+		// <Really should default everything to BaseMEnu via a loop and then make 
+		// indicidual assignments>
 		menus[TOP] = new TopMenu;
 		menus[ANALOG] = new AnalogMenu;
 		menus[DIGITAL_TOP] = new DigitalMenu;
@@ -108,13 +103,13 @@ public:
 		menus[DIGITAL_PWM] = new PWMMenu;
 		menus[DIGITAL_IO] = new DigitalIOMenu;
 		menus[DIGITAL_RELAY] = new RelayMenu;
-		menus[DIGITAL_IO_STATE] = new DigitalIOStateMenu;
+		menus[DIGITAL_IO_STATE] = new BaseMenu;
 		menus[DIGITAL_IO_CLOCK] = new BaseMenu;
-		menus[DIGITAL_IO_ENCODER] = new DigitalIOEncoderMenu;
+		menus[DIGITAL_IO_ENCODER] = new BaseMenu;
 
 		// Inform appropriate menus of already allocated ports
-		menus[DIGITAL_PWM]->SetPWMTableEntry (LEFT_DRIVE_PWM, &leftMotor);
-		menus[DIGITAL_PWM]->SetPWMTableEntry (RIGHT_DRIVE_PWM, &rightMotor);
+		menus[DIGITAL_PWM]->SetTableEntry (LEFT_DRIVE_PWM, &leftMotor);
+		menus[DIGITAL_PWM]->SetTableEntry (RIGHT_DRIVE_PWM, &rightMotor);
 
 		// Write out the TOP menu for the first time
 		menus[currentMenu]->UpdateDisplay();

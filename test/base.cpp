@@ -75,32 +75,8 @@ void BaseMenu::SetSpeed (float speed)
 	
 }
 
-void BaseMenu::SetPWMTableEntry (int index, Jaguar * pointer)
+void BaseMenu::SetTableEntry (int index, Jaguar * pointer)
 {
 	
 }
 
-void SetAnalogTableEntry (int index, AnalogChannel * pointer)
-{
-	
-}
-
-void SetDigitalInputTableEntry (int index, DigitalInput * pointer)
-{
-	
-}
-
-void SetDigitalOutputTableEntry (int index, DigitalOutput * pointer)
-{
-	
-}
-
-void SetSolenoidPWMTableEntry (int index, Solenoid * pointer)
-{
-	
-}
-
-void SetRelayTableEntry (int index, Relay * pointer)
-{
-	
-}

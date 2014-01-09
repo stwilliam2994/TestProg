@@ -17,11 +17,6 @@ TopMenu::TopMenu()
 	maxIndex_m = 5;
 }
 
-TopMenu::~TopMenu()
-{
-
-}
-
 menuType TopMenu::HandleSelectLeft ()
 {
 	//return HandleSelect();

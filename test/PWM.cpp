@@ -2,12 +2,13 @@
 
 // PWM Menu
 	
+	
 PWMMenu::PWMMenu()
 {
 	// The PWM menu looks like this (not including the 1st 2 columns):
 	// 1:PWM
-	// 2: Channel A: # #.##
-	// 3: Channel B: # #.##
+	// 2: Channel A: #
+	// 3: Channel B: #
 	// 4: Enabled:
 	// 5: Back
 	// 6:
@@ -20,15 +21,15 @@ PWMMenu::PWMMenu()
 	currentChannelNumB_m   = 0;
 	enabled_m = NEITHER;
 	
+	
 	// Create a PWM object for every channel on the module
-	// (note that PWM channels are numbered 1->10 in the API and 1->10 on the module
-	// but we are using 0->9)
+	// (note that PWM channels are numbered 1->10 in the API and 1->10 on the module)
+	// We are using 0->9
 	
 	for (int i=0; i <= MAX_PWM_CHANNEL; i++)
 	{
-		// Need to assign from existing pointers here if any PWM ports are already
-		// allocated in the the main RobotDemo constructor! Use SetPWMTableEntry to
-		// overide any of the entries in this table as required.
+		// Need to assign from existing pointers here if and PWM ports are already
+		// allocated in the the main RobotDemo constructor! See SetTableEntry
 		channel_mp[i] = new Jaguar(i + 1);
 		channel_mp[i]->SetExpiration(0.2); 
 	}
@@ -38,20 +39,14 @@ PWMMenu::~PWMMenu()
 {
 	for (int i=0; i <= MAX_PWM_CHANNEL; i++)
 	{
-		// This will delete any objects added to the table by SetPWMTableEntry without
-		// the original creator knowing about it. However, this destructor won't ever
-		// be called
 		delete channel_mp[i];
 	}
 }
 
-void PWMMenu::SetPWMTableEntry (int index, Jaguar * pointer)
+void PWMMenu::SetTableEntry (int index, Jaguar * pointer)
 {
-	// Don't leak the object already pointed to by the table entry...
-	delete channel_mp[index - 1];
-	
-	channel_mp[index - 1] = pointer;
-	channel_mp[index - 1]->SetExpiration(0.2);
+	channel_mp[index] = pointer;
+	channel_mp[index]->SetExpiration(0.2);
 };
 
 menuType PWMMenu::HandleSelectLeft ()
@@ -125,11 +120,10 @@ menuType PWMMenu::HandleSelectRight ()
 void PWMMenu::SetSpeed (float speed)
 {
 	// To keep motor safety tmeouts from occuring we need to set all of the motor
-	// controllers each pass of the main program loop (and this method *is* called 
+	// controllers each pass of the main program loop (and this method is called 
 	// in each pass of the main program loop)
 	
 	bool alreadySet = false;
-	
 	for (int i = MIN_PWM_CHANNEL; i <= MAX_PWM_CHANNEL; i++)
 	{
 		alreadySet = false;
@@ -138,7 +132,6 @@ void PWMMenu::SetSpeed (float speed)
 			channel_mp[i]->Set(speed);
 			alreadySet = true;
 		}
-		
 		if ((i == currentChannelNumB_m) && ((B_ONLY == enabled_m) || (BOTH == enabled_m)))
 		{
 			channel_mp[i]->Set(speed);
@@ -155,20 +148,19 @@ void PWMMenu::SetSpeed (float speed)
 void PWMMenu::UpdateDisplay ()
 {
 	const char * enabledStrings[] = 
-	{
-		"Neither",
-		"A Only",
-		"B Only",
-		"Both"
-	};
-	
+		{
+			"Neither",
+			"A Only",
+			"B Only",
+			"Both"
+		};
 	int chanA = currentChannelNumA_m + 1;
 	int chanB = currentChannelNumB_m + 1;
 
 	dsLCD->Clear();
 	dsLCD->PrintfLine(LCD1, "PWM");
-	dsLCD->PrintfLine(LCD2, " Channel A: %d %5.2f", chanA, channel_mp[chanA]->Get());
-	dsLCD->PrintfLine(LCD3, " Channel B: %d %5.2f", chanB, channel_mp[chanB]->Get());
+	dsLCD->PrintfLine(LCD2, " Channel A: %d", chanA);
+	dsLCD->PrintfLine(LCD3, " Channel B: %d", chanB);
 	dsLCD->PrintfLine(LCD4, " Enabled: %s", enabledStrings[enabled_m]);
 	dsLCD->PrintfLine(LCD5, " Back");
 	dsLCD->Printf(IndexToLCDLine(index_m), 1, "*");
