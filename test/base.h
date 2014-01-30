@@ -122,6 +122,11 @@ private:
 #define MIN_SOLENOID_CHANNEL 0
 #define MAX_SOLENOID_CHANNEL 7
 
+typedef enum {
+	SINGLE,
+	DUAL
+} modeType;
+
 class SolenoidMenu : public BaseMenu
 {
 	
@@ -133,11 +138,15 @@ public:
 	void     doIndexDown ();
 	menuType HandleSelectLeft ();
 	menuType HandleSelectRight ();
+	void     SwitchMode();
 	void     UpdateDisplay ();
 	
-	int        currentChannelNum_m;
+	int        mode_m;
+	int        currentChannelNumA_m;
+	int        currentChannelNumB_m;
 	bool       currentChannelValue_m;
 	Solenoid * channel_mp[MAX_SOLENOID_CHANNEL + 1];
+	DoubleSolenoid * doubleSolenoid_mp;
 };
 
 // ----------------------------------------------------------------------------
