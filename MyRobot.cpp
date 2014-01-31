@@ -57,16 +57,20 @@ public:
 	{
 		// Loop counter to ensure that the program us running (debug helper
 		// that can be removed when things get more stable)
-		int sanity = 0;
+		int sanity, bigSanity = 0;
 
 		while (IsOperatorControl())
 		{
 			dsLCD->Clear();
 			dsLCD->PrintfLine(DriverStationLCD::kUser_Line1, "2013 Test Fix");
 			dsLCD->PrintfLine(DriverStationLCD::kUser_Line2, "Teleop Mode");
-			dsLCD->PrintfLine(DriverStationLCD::kUser_Line6, "Sanity: %d", sanity);
+			dsLCD->PrintfLine(DriverStationLCD::kUser_Line6, "bigSanity: %d", sanity);
 			dsLCD->UpdateLCD();
 			sanity++;
+			if (0 == sanity % 20)
+			{
+				bigSanity++;
+			}
 			Wait(1.0);				// wait for a motor update time
 		}
 	}

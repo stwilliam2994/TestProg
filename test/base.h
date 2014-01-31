@@ -144,7 +144,6 @@ public:
 	int        mode_m;
 	int        currentChannelNumA_m;
 	int        currentChannelNumB_m;
-	bool       currentChannelValue_m;
 	Solenoid * channel_mp[MAX_SOLENOID_CHANNEL + 1];
 	DoubleSolenoid * doubleSolenoid_mp;
 };

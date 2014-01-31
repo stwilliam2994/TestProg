@@ -6,10 +6,10 @@ SolenoidMenu::SolenoidMenu()
 {
 	// The solenoid menu looks like this (not including the 1st 2 columns):
 	// 1: Solenoid: [Single|Dual]
-	// 2: Channel: #
-	// 3: Set: $$$
-	// 4: Back
-	// 5:
+	// 2: Channel A: #
+	// 3: Channel B: #
+	// 4: Set: $$$
+	// 5: Back
 	// 6:
 
 	minIndex_m = 1;
@@ -19,8 +19,7 @@ SolenoidMenu::SolenoidMenu()
 	
 	// Always start pointing at Channel and solenoid channels initialize to off
 	currentChannelNumA_m   = 0;
-	currentChannelNumB_m   = 0;
-	currentChannelValue_m = FALSE;
+	currentChannelNumB_m   = 1;
 	
 	// Create a solenoid object for every channel on the module (we start out in single mode)
 	// (note that solenoid channels are numbered 1->8 in the API but 0->7 on the module)
@@ -42,11 +41,8 @@ void SolenoidMenu::SwitchMode ()
 		{
 			channel_mp[i]->Set(false);
 			delete channel_mp[i];
+			channel_mp[i] = NULL;
 		}
-
-		// Set channels A and B back to 0 and 1, respectively
-		currentChannelNumA_m   = 0;
-		currentChannelNumB_m   = 1;
 
 		// Allocate a dual solenoid object
 		doubleSolenoid_mp = new DoubleSolenoid (currentChannelNumA_m + 1, currentChannelNumB_m + 1);
@@ -56,6 +52,7 @@ void SolenoidMenu::SwitchMode ()
 		// Delete the double solenoid object
 		doubleSolenoid_mp->Set(DoubleSolenoid::kOff);
 		delete doubleSolenoid_mp;
+		doubleSolenoid_mp = NULL;
 		
 		// Allocate a table of solenoid objects
 		for (int i=0; i <= MAX_SOLENOID_CHANNEL; i++)
@@ -73,11 +70,13 @@ SolenoidMenu::~SolenoidMenu()
 		for (int i=0; i <= MAX_SOLENOID_CHANNEL; i++)
 		{
 			delete channel_mp[i];
+			channel_mp[i] = NULL;
 		}
 	}
 	else
 	{
 		delete doubleSolenoid_mp;
+		doubleSolenoid_mp = NULL;
 	}
 }
 
@@ -125,9 +124,6 @@ menuType SolenoidMenu::HandleSelectLeft ()
 						currentChannelNumB_m--;
 					}
 				}
-			}
-			if (DUAL == mode_m)
-			{
 				doubleSolenoid_mp->Set(DoubleSolenoid::kOff);
 				delete doubleSolenoid_mp;
 				doubleSolenoid_mp = new DoubleSolenoid(currentChannelNumA_m + 1, currentChannelNumB_m + 1);
@@ -209,9 +205,6 @@ menuType SolenoidMenu::HandleSelectRight ()
 						currentChannelNumB_m++;
 					}
 				}
-			}
-			if (DUAL == mode_m)
-			{
 				doubleSolenoid_mp->Set(DoubleSolenoid::kOff);
 				delete doubleSolenoid_mp;
 				doubleSolenoid_mp = new DoubleSolenoid(currentChannelNumA_m + 1, currentChannelNumB_m + 1);
@@ -254,7 +247,7 @@ void SolenoidMenu::UpdateDisplay ()
 	dsLCD->PrintfLine(LCD2, " Channel A: %d", currentChannelNumA_m);
 	if (SINGLE == mode_m)
 	{
-		dsLCD->PrintfLine(LCD3, "                    ");
+		dsLCD->PrintfLine(LCD3, " Channel B: -       ");
 	}
 	else
 	{
@@ -266,25 +259,21 @@ void SolenoidMenu::UpdateDisplay ()
 	}
 	else
 	{	
-		char * string = NULL;
 		switch (doubleSolenoid_mp->Get())
 		{
 			case DoubleSolenoid::kOff:
-				string = "Off";
+				dsLCD->PrintfLine(LCD4, " Set: Off");
 				break;
 			case DoubleSolenoid::kForward:
-				string = "For";
+				dsLCD->PrintfLine(LCD4, " Set: Forward");
 				break;
 			case DoubleSolenoid::kReverse:
-				string = "Rev";
+				dsLCD->PrintfLine(LCD4, " Set: Reverse");
 				break;
 			default:
-				string = "Error";
+				dsLCD->PrintfLine(LCD4, " Set: Error");
 				break;
-		}
-		
-		dsLCD->PrintfLine(LCD4, " Set: %s", string);
-	
+		}	
 	}
 	dsLCD->PrintfLine(LCD5, " Back");
 	dsLCD->Printf(IndexToLCDLine(index_m), 1, "*");
