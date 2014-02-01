@@ -59,7 +59,7 @@ public:
 		// that can be removed when things get more stable)
 		int sanity, bigSanity = 0;
 
-		while (IsOperatorControl())
+		while (IsOperatorControl() &&IsEnabled())
 		{
 			dsLCD->Clear();
 			dsLCD->PrintfLine(DriverStationLCD::kUser_Line1, "2013 Test Fix");
@@ -122,7 +122,7 @@ public:
 		// that can be removed when things get more stable)
 		int sanity = 0;
 	
-		while (IsTest())
+		while (IsTest() && IsEnabled())
 		{
 			// The dpad "up" button is used to move the menu pointer up one line
 			// on the LCD display
@@ -188,10 +188,15 @@ public:
 			menus[currentMenu]->UpdateDisplay();
 			
 			// Dump the sanity time value to the LCD
-			dsLCD->PrintfLine(DriverStationLCD::kUser_Line6, "Sanity: %d", sanity);
+			
+//			dsLCD->PrintfLine(DriverStationLCD::kUser_Line6, "Sanity: %d", bigSanity);
 			dsLCD->UpdateLCD();
 			
 			sanity++;
+			if (0 == sanity % 20)
+			{
+				printf ("sanity = %d\r", sanity/20);
+			}
 			
 			// Run the loop every 50 msec (20 times per second)
 			Wait(0.050);
