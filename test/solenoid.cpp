@@ -89,14 +89,14 @@ menuType SolenoidMenu::HandleSelectLeft ()
 			break;
 		case 2: // Decrement channel A pointer 
 			currentChannelNumA_m--;
-			if (currentChannelNumA_m == currentChannelNumB_m)
+			if ((currentChannelNumA_m == currentChannelNumB_m) && (DUAL == mode_m))
 			{
 				currentChannelNumA_m--;
 			}
 			if (currentChannelNumA_m < MIN_SOLENOID_CHANNEL)
 			{
 				currentChannelNumA_m = MAX_SOLENOID_CHANNEL;
-				if (currentChannelNumA_m == currentChannelNumB_m)
+				if ((currentChannelNumA_m == currentChannelNumB_m) && (DUAL == mode_m))
 				{
 					currentChannelNumA_m--;
 				}
@@ -170,14 +170,14 @@ menuType SolenoidMenu::HandleSelectRight ()
 			break;
 		case 2: // Increment channel A pointer 
 			currentChannelNumA_m++;
-			if (currentChannelNumA_m == currentChannelNumB_m)
+			if ((currentChannelNumA_m == currentChannelNumB_m) && (DUAL == mode_m))
 			{
 				currentChannelNumA_m++;
 			}
 			if (currentChannelNumA_m > MAX_SOLENOID_CHANNEL)
 			{
 				currentChannelNumA_m = MIN_SOLENOID_CHANNEL;
-				if (currentChannelNumA_m == currentChannelNumB_m)
+				if ((currentChannelNumA_m == currentChannelNumB_m) && (DUAL == mode_m))
 				{
 					currentChannelNumA_m++;
 				}
