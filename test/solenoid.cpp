@@ -44,6 +44,15 @@ void SolenoidMenu::SwitchMode ()
 			channel_mp[i] = NULL;
 		}
 
+		// Make sure that the chanels are different
+		if (currentChannelNumA_m == currentChannelNumB_m)
+		{
+			currentChannelNumB_m++;
+			if (currentChannelNumB_m > MAX_SOLENOID_CHANNEL)
+			{
+				currentChannelNumB_m = MIN_SOLENOID_CHANNEL;
+			}	
+		}
 		// Allocate a dual solenoid object
 		doubleSolenoid_mp = new DoubleSolenoid (currentChannelNumA_m + 1, currentChannelNumB_m + 1);
 	}
