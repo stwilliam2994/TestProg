@@ -59,7 +59,7 @@ public:
 		// that can be removed when things get more stable)
 		int sanity, bigSanity = 0;
 
-		while (IsOperatorControl())
+		while (IsOperatorControl() && IsEnabled())
 		{
 			dsLCD->Clear();
 			dsLCD->PrintfLine(DriverStationLCD::kUser_Line1, "2013 Test Fix");
